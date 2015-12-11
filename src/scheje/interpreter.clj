@@ -14,24 +14,30 @@
          
          [(false :<< seq?)] exp
          
+         [(['null? alist] :seq)] `(empty? ~alist)
+
+         [(['pair? alist] :seq)] `(list? ~alist)
+
+         [(['eq? exp1 exp2] :seq)] `(= ~exp1 ~exp2)
+         
          [(['car alist] :seq)] `(first (scheme->clj ~alist))
          
          [(['cdr alist] :seq)] `(rest (scheme->clj  ~alist))
 
          [(['cons elt alist] :seq)] `(cons (scheme->clj ~elt) (scheme->clj ~alist))
          
-         [(['lambda args body] :seq)] `(fn ~(into [] args) ~(scheme-body->clj body))
 
-         [(['letrec* bindings body] :seq)] `(let ~(into []
-                                                        (mapcat
-                                                         (fn [[target a_binding]]
-                                                           [target `(scheme->clj ~a_binding)])
-                                                         bindings))
-                                              ~(scheme-body->clj body))
+
+         [(['letrec* bindings & body] :seq)]   `(let ~(into []
+                                                            (mapcat
+                                                             (fn [[target a_binding]]
+                                                               [target `(scheme->clj ~a_binding)])
+                                                             bindings))
+                                                  ~(cons 'do (scheme-body->clj body)))
          
          [(['define target a_binding] :seq)] `(def ~target (scheme->clj ~a_binding)) 
 
-         [(['cond & conditions] :seq)]  (cons `cond
+         [(['cond & conditions] :seq)]  (cons 'cond
                                               (mapcat
                                                 (fn [[cnd op]]
                                                   (if (= cnd 'else)
@@ -39,10 +45,12 @@
                                                     `[(scheme->clj ~cnd) (scheme->clj ~op)]))
                                                 conditions))
 
+         [(['lambda args & body] :seq)] `(fn ~(into [] args) ~(cons 'do  (scheme-body->clj body)))
+         
          [(['define-syntax syntax-name (['syntax-rules literals pattern-templates] :seq)] :seq)] `(define-syntax-macro ~syntax-name
                                                                                                     ~literals
                                                                                                     ~pattern-templates) 
-         [(['begin & exprs] :seq)] (cons `do (scheme-body->clj exprs))
+         [(['begin & exprs] :seq)] (cons 'do (scheme-body->clj exprs))
          
          [(['quote an_exp] :seq)] `'~(scheme->clj an_exp)
          
@@ -106,8 +114,8 @@
 (defmacro define-symbols
   [syms]
   (cons `do  (map
-             (fn[s] `(def ~s ~(keyword s)))
-             syms)))
+              (fn[s] `(def ~s ~(keyword s)))
+              syms)))
 
 (defmacro define-syntax-macro
   [macro-name
@@ -124,7 +132,10 @@
            (match [input-lit-kws#]
                   ~@pattern-rows))))))
 
+
+
 (defn eval-scheme [str-exp]
   (eval  (cons #'scheme->clj
                `(~(read-string  str-exp)))))
+
 

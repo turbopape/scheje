@@ -1,2 +1,0 @@
-(ns scheje.core)
-
