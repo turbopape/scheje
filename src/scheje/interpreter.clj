@@ -1,4 +1,4 @@
-(ns scheje.compiler
+(ns scheje.interperter
   (:require [clojure.core.match :refer [match]]))
 
 (defn scheme-body->clj [body]
