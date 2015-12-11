@@ -42,7 +42,6 @@
          [(['define-syntax syntax-name (['syntax-rules literals pattern-templates] :seq)] :seq)] `(define-syntax-macro ~syntax-name
                                                                                                     ~literals
                                                                                                     ~pattern-templates) 
-         
          [(['begin & exprs] :seq)] (cons `do (scheme-body->clj exprs))
          
          [(['quote an_exp] :seq)] `'~(scheme->clj an_exp)
@@ -116,7 +115,6 @@
    pattern-templates]
   (let [input (gensym 'input)
         pattern-rows (define-syntax-matches literals  pattern-templates)]
-    
     `(do 
        (define-symbols ~literals)
        (defn ~macro-name
@@ -127,5 +125,6 @@
                   ~@pattern-rows))))))
 
 (defn eval-scheme [str-exp]
-  (eval  (cons 'rest-api.compiler/scheme->clj `(~(read-string  str-exp)))))
+  (eval  (cons #'scheme->clj
+               `(~(read-string  str-exp)))))
 
