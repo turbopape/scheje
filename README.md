@@ -1,81 +1,66 @@
-# Scheje - A Little Scheme Using Clojure Macros
+# scheje 
 
-Using a Set of Clojure Macros, Scheje is a scheme implementation on
-top of Clojure.
+Now using the magnificent eval/apply dance (as in page 13 of the
+Lisp 1.5 Manual), *scheje* is a tiny scheme implementation on Top of
+Clojure.
 
-This is a tiny project part of the
-[TNTeam's entry to Clojure Cup 2015](https://github.com/parenode/clojure-cup-2015),
-which is mainly a study for the greater
-[parenode project](https://github.com/parenode).
+Now *scheje* properly implements *define-sytnax*, ellipsis is properly
+expanded into relevant symbols, which can be respectively used in the
+generated *syntax-rules* templates. In fact, even *let* is implemented in
+terms of *define-syntax*.
 
-Scheje interprets define, lambda, letrec,cond and has even primary support for
-define-syntax:
+the two defining forms, *define* and *define-syntax* generate new
+environments as per the bindings they introduce. Helper functions that
+interpret these along with other evaluations will be discussed later.
 
+This implementation greatly improves the latest version, which used to
+use Clojure macros. Using lists evaluation, it is possible to use
+scheje as a library on top of ClojureScript as well.
+## Usage
+
+The main interpretation function is *form-eval* in the *interpreter*
+name-space.
+
+
+You give it a form and an environment, and you get your evaluation:
 ```clojure
-scheje.interperter> (scheme->clj (define a 
-                                   (lambda(x) 
-                                     (+ 1 x))))
-;;=> #'scheje.interperter/a
-
-scheje.interperter> (a 4)
-;;=> 5
-
-scheje.interperter> (scheme->clj (letrec*
-                                  ((a 1)
-                                   (b (lambda(x)(+ 1 x)))) 
-                                  (+ a (b 2))))
-;;=> 4
-
-
-scheje.interperter> (scheme->clj  (cond ((< 1 2) true) 
-                                        ((> 3 4) false) 
-                                        (else (+ 2 3))))
-
-;;=> true
-
-scheje.interperter> (scheme->clj  (define-syntax add 
-                                    (syntax-rules (with) 
-                                                  ((add a with b) (+ a b)))))
-
-;;=> #'scheje.interperter/add
-scheje.interperter> (add 1 with 4)
-;;=> 5
-
-```
-Actually, all of these constructions are passed to a "big" macro
-containing a match clause that translates these expression to a more
-or less direct Clojure counterpart, except for define-syntax that
-internalizes the literals list (as symbols pointing to a "keywordized"
-version of themselves), and generates an fn that encompasses a
-generated match clause to provide for the pattern rows template.
-
-It is possible to invoke any of these evaluations by passing strings
-containing the expression to evaluate, using the eval-scheme function:
-
-```clojure
-
-scheje.interperter> (eval-scheme  "(define-syntax add-again 
-                                    (syntax-rules (with) 
-                                                  ((add a with b) (+ a b))))")
-
-;;=> #'scheje.interperter/add-again
-scheje.interperter> (add-again 1 with 3)
-;;=> 4
-```
-So it may be pretty easy to integrate scheje with a REPL.
-
-Now time to test scheme's hello world, the mighty append:
-
-```clojure
-scheje.interperter> (scheme->clj (define append
-                                   (lambda (l1 l2)
-                                      (cond
-                                        ((null? l1) l2)
-                                        (else (cons (car l1) (append (cdr l1) l2)))))))
-;;=> #'scheje.interperter/append
-scheje.interperter> (scheme->clj (append '(1 2 3) '(4 5 6)))
-;;=> (1 2 3 4 5 6)
-
+(form-eval '(+ x y) '{x 1 y 2})
+;;=> 3
 ```
 
-IT WORKS !!!
+But there is a more advanced function *eval-prog*, that evaluates a
+whole program. This function is bootstrapped with a starting
+environment (implementing some basic symbol definitions and the *let*
+form defined with *define-syntax*). It also does what it takes to only
+show the latest form evaluation in its input program.
+
+Here are two samples:
+
+```clojure
+(eval-prog  '((define-syntax let
+                (syntax-rules ()
+                              ((let ((var expr) ...) body ...)
+                               ((lambda (var ...) body ...) expr ...))))
+              (let ((x 1)(y 2)) (+ x y))))
+;;=>3
+```
+This example shows how we did to introduce the let form, though it is
+already implemented in the root environment used by scheje, so you
+don't have to define it every time you use *eval-prog*
+
+```clojure
+(eval-prog '((define append
+               (lambda (l1 l2)
+                  (cond
+                    ((null? l1) l2)
+                    (else (cons (car l1) (append (cdr l1) l2))))))
+             (append '(1 2 3) '(4 5 6))))
+;;=> '(1 2 3 4 5 6)
+```
+The above example is the must-have *append* function, necessary for
+every decent scheme implementation!
+
+## License
+
+Copyright © 2016 Rafik Naccache
+Distributed under the terms of the The MIT License.

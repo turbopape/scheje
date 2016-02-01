@@ -1,141 +1,138 @@
-(ns scheje.interperter
-  (:require [clojure.core.match :refer [match]]))
+(ns scheje.interpreter
+  (:require [clojure.core.match :refer [match]]
+            [scheje.tools :refer :all] 
+            [scheje.unifier :as unifier]
+            [scheje.expander :as expander]))
 
-(defn scheme-body->clj [body]
-  (if (seq? body)
-    (map
-     (fn [statement] `(scheme->clj ~statement))
-     body)
-    body))
 
-(defmacro scheme->clj [exp]
 
+(declare form-eval)
+
+(defn form-apply
+  [exp a]
   (match [exp]
-         
-         [(false :<< seq?)] exp
-         
-         [(['null? alist] :seq)] `(empty? ~alist)
+         [([(f :guard atom?) & r] :seq )] (cond
+                                            (= f 'null?) (=  '(()) r)                                          
+                                            (= f 'car) (-> r first first)
+                                            (= f 'cdr) (-> r first rest )
+                                            (= f 'cons) (cons (first r) (second r))
+                                            (= f 'atom?) (atom? (first r))
+                                            (= f '+) (apply + (into [] r))
+                                            (= f '-) (apply - (into [] r))
+                                            (= f '/) (apply / (into [] r))
+                                            (= f '*) (apply * (into [] r))
+                                            (= f '<) (apply < (into [] r))
+                                            (= f '>) (apply > (into [] r))
+                                            (= f '<=) (apply <= (into [] r))
+                                            (= f '>=) (apply >= (into [] r)) 
+                                            :else (form-apply (cons  (form-eval f a) r) a))
+         [([(['lambda parms body]:seq) & args ]:seq)] (form-eval body (pairlis parms   args  a))))
 
-         [(['pair? alist] :seq)] `(list? ~alist)
-
-         [(['eq? exp1 exp2] :seq)] `(= ~exp1 ~exp2)
-         
-         [(['car alist] :seq)] `(first (scheme->clj ~alist))
-         
-         [(['cdr alist] :seq)] `(rest (scheme->clj  ~alist))
-
-         [(['cons elt alist] :seq)] `(cons (scheme->clj ~elt) (scheme->clj ~alist))
-         
-
-
-         [(['letrec* bindings & body] :seq)]   `(let ~(into []
-                                                            (mapcat
-                                                             (fn [[target a_binding]]
-                                                               [target `(scheme->clj ~a_binding)])
-                                                             bindings))
-                                                  ~(cons 'do (scheme-body->clj body)))
-         
-         [(['define target a_binding] :seq)] `(def ~target (scheme->clj ~a_binding)) 
-
-         [(['cond & conditions] :seq)]  (cons 'cond
-                                              (mapcat
-                                                (fn [[cnd op]]
-                                                  (if (= cnd 'else)
-                                                    [:else `(scheme->clj ~op)]
-                                                    `[(scheme->clj ~cnd) (scheme->clj ~op)]))
-                                                conditions))
-
-         [(['lambda args & body] :seq)] `(fn ~(into [] args) ~(cons 'do  (scheme-body->clj body)))
-         
-         [(['define-syntax syntax-name (['syntax-rules literals pattern-templates] :seq)] :seq)] `(define-syntax-macro ~syntax-name
-                                                                                                    ~literals
-                                                                                                    ~pattern-templates) 
-         [(['begin & exprs] :seq)] (cons 'do (scheme-body->clj exprs))
-         
-         [(['quote an_exp] :seq)] `'~(scheme->clj an_exp)
-         
-         [([proc & args] :seq)] (cons `(scheme->clj ~proc)  (scheme-body->clj args))
-         
-         [([] :seq)] nil
-
-         [:default] `(:error in ~exp)))
-
-(defn ellipsis-seq
-  [a_seq]
-  (if (= '... (last a_seq)) (into '(& $$ellipsis$$)
-                                  (pop (reverse a_seq)))
-      a_seq))
-
-(defn change-tpl-seq
-  [ a_seq]
-  ;; there must be only one ellipsis for the tpl to be good!!
-  ;; if there are many of them, the will be matched against the same pattern!!
-  (cond (seq? a_seq) (let [a_seq_modified (ellipsis-seq a_seq)]
-                       `([~@a_seq_modified] :seq))
-
-        :else a_seq))
-
-(defn  remove-ellipsis
-  [a-seq]
-  (clojure.walk/postwalk #(if (and (seq? %)(= '... (last %)))
-                            (into '( $$ellipsis$$)
-                                  (pop (reverse %)))
-                            %)  
-                            a-seq))
-
-(defn scheme-literals->keywords
-  [literals a_seq]
+(defn evcon
+  [conds a]
   (cond
-    (some #{a_seq} literals) (keyword a_seq)
-    :else  a_seq))
+    (form-eval (-> conds first first) a) (form-eval (-> conds first rest first) a)
+    :else (evcon (rest conds) a)))
 
-(defn scheme-tpl->clj
-  [pattern literals]
-  (->> pattern
-       (clojure.walk/postwalk (comp (partial scheme-literals->keywords literals)
-                                    change-tpl-seq))))
+(defn evlis
+  [exps a]
+  (map #(form-eval % a) exps))
 
-(defn define-syntax-match-row
-  [literals pattern template]
-  `([~(scheme-tpl->clj pattern literals)] (scheme->clj  ~(remove-ellipsis template)) ))
 
-(defn define-syntax-matches
-  [literals pattern-templates]
-  (let [pattern-templates-pairs (partition 2 2 pattern-templates)]
-    (mapcat
-     (fn [[p t]]
-       (let [inspected-pattern-in (pop p)
-             inspected-pattern (if (= 1 (count inspected-pattern-in))
-                                 (first inspected-pattern-in)
-                                 inspected-pattern-in)]
-         (define-syntax-match-row literals inspected-pattern t)))
-     pattern-templates-pairs)))
-
-(defmacro define-symbols
-  [syms]
-  (cons `do  (map
-              (fn[s] `(def ~s ~(keyword s)))
-              syms)))
-
-(defmacro define-syntax-macro
-  [macro-name
+(defn define-syntax
+  [a
+   syn-name
    literals
-   pattern-templates]
-  (let [input (gensym 'input)
-        pattern-rows (define-syntax-matches literals  pattern-templates)]
-    `(do 
-       (define-symbols ~literals)
-       (defn ~macro-name
-         [& ~input]
-         (let [lits# '~literals
-               input-lit-kws# `~(map (partial scheme-literals->keywords lits#) ~input) ]
-           (match [input-lit-kws#]
-                  ~@pattern-rows))))))
+   pattern-rules]
+  (update-in a [:syntax ] conj {:name syn-name
+                                :literals literals
+                                :rules  pattern-rules}))
+
+(defn define
+  [a
+   sym
+   binding]
+  (assoc a sym
+         (form-eval binding a)))
+
+(defn form-eval
+  [exp a]
+  (cond
+    (or  (= '() exp) 
+         (nil? exp)) '()
+    (or (number? exp)
+        (string? exp)
+        (rational? exp))  exp
+    (atom? exp) (get a exp)
+    (atom? (first exp))   (let [some-syn (get-syntax (first  exp) (:syntax a))]
+                            (cond
+                              (not (nil?  some-syn)) (let [{:keys [rules]} some-syn]  
+                                                       (loop [remaining rules]
+                                                         (let [cur-rule (first remaining)
+                                                               cur-pattern (first cur-rule)
+                                                               cur-tpl (second cur-rule)
+                                                               a-match (unifier/unify cur-pattern exp a)]
+                                                           (cond
+                                                             (nil? (get a-match :error)) (let [expanded-tpl
+                                                                                               (expander/expand-w-bindings cur-tpl
+                                                                                                                    a-match)]
+                                                                                           (form-eval expanded-tpl
+                                                                                                      (conj a
+                                                                                                            a-match))) 
+                                                             :else (if (seq remaining)
+                                                                     (recur (rest remaining))
+                                                                     (str  "error in resolving syntax " exp))))))
+                          
+
+                              
+                              (or (rational? (first exp))
+                                  (string? (first exp))
+                                  (number? (first exp))) (str "error: The Scalar: `" (first exp) "` Cannot be Applied on " (rest exp) "!!")
+
+                              (= (first exp) 'lambda) exp
+                              
+                              (= (first exp) 'quote) (-> exp rest first)
+                              (= (first exp) 'cond) (evcon (rest exp) a)
+                              (= (first exp) 'if) (if (form-eval (-> exp rest first) a)
+                                                    (form-eval (-> exp rest second) a)
+                                                    (form-eval (-> exp rest (nth 2)) a))
+                              :else (form-apply (cons (first exp) (evlis (rest exp) a)) a)))
+    :else (form-apply (cons (first exp) (evlis (rest exp) a)) a)))
 
 
+(def
+  root-env
+  {'true true
+   'false false
+   'else true
+   :syntax ['{:name let, :literals (),
+              :rules (((let ((var expr) ...) body ...)
+                       ((lambda (var ...) body ...) expr ...)))}]})
 
-(defn eval-scheme [str-exp]
-  (eval  (cons #'scheme->clj
-               `(~(read-string  str-exp)))))
 
+(defn eval-prog-with-env
+  [a exprs]
+  (loop [remaining exprs
+         eval-result {}
+         env a]
+    (if (seq remaining)
+      (let [exp (first remaining)
+            [new-env the-eval] (cond
+                                 (= (first exp) 'define-syntax) [(define-syntax env
+                                                                   (second exp)
+                                                                   (-> exp rest second second)
+                                                                   (-> exp rest second rest rest))
+                                                                 (second exp)]
+                                 (= (first exp) 'define) [(define env
+                                                            (second exp)
+                                                            (-> exp rest rest first))
+                                                          (second exp)]
+                                 :else [env (form-eval exp env)])]
+        (recur (rest remaining)
+               (assoc eval-result exp the-eval)
+               new-env))
+      {:env env
+       :evals eval-result})))
+
+(def eval-prog (comp last vals :evals (partial eval-prog-with-env root-env)))
 
