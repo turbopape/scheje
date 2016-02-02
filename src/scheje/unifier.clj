@@ -118,7 +118,6 @@
      (seq? v))  (match [u]
                            [([exp '... & r] :seq)] (letfn [(parse-ellipsis
                                                              [u v r]
-
                                                              (if (nil? v)
                                                                #(ks @s)
                                                                  (fn[]

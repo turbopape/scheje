@@ -1,5 +1,12 @@
 # Change Log
-All notable changes to this project will be documented in this file. This change log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
+
+## 0.2.1 [2016-02-02]
+###Added
+- quasiquote, unquote, unquote-splicing, and, or 
+
+###Fixed
+- Now vars used in macros are stored in their proper scope, so they
+  don't pile up across successive calls to same macros.
 
 ## [0.2.0][2016-02-01]
 ### Changed
@@ -20,4 +27,4 @@ All notable changes to this project will be documented in this file. This change
 - First version of the interpreter, using Clojure macros. Mainly a
   working version of the work done as [TNTeam's entry for Clojure Cup 2015](https://github.com/parenode/clojure-cup-2015).
 
-[0.2.0]: https://github.com/turbopape/scheje/compare/0.1.0...0.2.0
+[0.2.1]: https://github.com/turbopape/scheje/compare/master@%7B1day%7D...master

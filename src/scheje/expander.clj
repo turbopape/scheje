@@ -72,7 +72,10 @@
   (let [expanded (expand-exp exp a-match)]
     (w/postwalk
      (fn [x]
-       (if-let [bdng (get a-match x)]
-         bdng
-         x))
+
+       (let [bdng (get a-match x)]
+         (if (not (nil? bdng))
+           bdng
+           x
+           )))
      expanded)))

@@ -57,6 +57,7 @@
 
 (defn form-eval-quasi
   [exp a]
+
   (cond
     (atom? exp) exp 
 
@@ -71,51 +72,60 @@
     (= (-> exp first first) 'unquote-splicing) (into (form-eval (-> exp first second ) a) (form-eval-quasi (rest exp) a) )
     :else (cons (form-eval-quasi (-> exp first) a) (form-eval-quasi (rest exp ) a))))
 
+
+
 (defn form-eval
   [exp a]
-  (cond
-    (or  (= '() exp) 
-         (nil? exp)) '()
-    (or (number? exp)
-        (string? exp)
-        (rational? exp))  exp
-    (atom? exp) (get a exp)
-    (atom? (first exp))   (let [some-syn (get-syntax (first  exp) (:syntax a))]
-                            (cond
-                              (not (nil?  some-syn)) (let [{:keys [rules]} some-syn]  
-                                                       (loop [remaining rules]
-                                                         (let [cur-rule (first remaining)
-                                                               cur-pattern (first cur-rule)
-                                                               cur-tpl (second cur-rule)
-                                                               a-match (unifier/unify cur-pattern exp a)]
-                                                           (cond
-                                                             (nil? (get a-match :error)) (let [expanded-tpl
-                                                                                               (expander/expand-w-bindings cur-tpl
-                                                                                                                    a-match)]
-                                                                                           (form-eval expanded-tpl
-                                                                                                      (conj a
-                                                                                                            a-match))) 
-                                                             :else (if (seq remaining)
-                                                                     (recur (rest remaining))
-                                                                     (str  "Error in resolving syntax " exp))))))
-                          
+    (cond
+      (or  (= '() exp) 
+           (nil? exp)) '()
+      (or (number? exp)
+          (string? exp)
+          (rational? exp))  exp
+      (atom? exp) (let [bdng-main (get a exp)]
+                    (if (not (nil? bdng-main )) 
+                      bdng-main
+                      (let [bdng-macros (get (:macros a) exp)]
+                        (if (not (nil? bdng-macros))
+                          bdng-macros
+                          (throw  (Exception.  (str  "No binding found for symbol: " exp)))))))
+      (atom? (first exp))   (let [some-syn (get-syntax (first  exp) (:syntax a))]
+                              (cond
+                                (not (nil?  some-syn)) (let [{:keys [rules]} some-syn]  
+                                                         (loop [remaining rules]
+                                                           (let [cur-rule (first remaining)
+                                                                 cur-pattern (first cur-rule)
+                                                                 cur-tpl (second cur-rule)
+                                                                 a-match (unifier/unify cur-pattern exp a)]
+                                                             (cond
+                                                               (nil? (get a-match :error)) (let [expanded-tpl
+                                                                                                 (expander/expand-w-bindings cur-tpl
+                                                                                                                             a-match)]
+                                                                                             (form-eval expanded-tpl
+                                                                                                        (assoc  a
+                                                                                                                :macros
+                                                                                                                a-match))) 
+                                                               :else (if (seq remaining)
+                                                                       (recur (rest remaining))
+                                                                       (str  "Error in resolving syntax " exp))))))
+                                
 
-                              
-                              (or (rational? (first exp))
-                                  (string? (first exp))
-                                  (number? (first exp))) (str "error: The Scalar: `" (first exp) "` Cannot be Applied on " (rest exp) "!!")
+                                
+                                (or (rational? (first exp))
+                                    (string? (first exp))
+                                    (number? (first exp))) (str "error: The Scalar: `" (first exp) "` Cannot be Applied on " (rest exp) "!!")
 
-                              (= (first exp) 'lambda) exp
-                              (= (first exp) 'quasiquote) (form-eval-quasi (second exp) a )
-                              (= (first exp) 'unquote) (str "error: unquote can only be called in a quasiquoted form!")
-                              (= (first exp) 'unquote-splicing) (str "error: unquote-splicing can only be called in a quasiquoted form!")
-                              (= (first exp) 'quote) (-> exp rest first)
-                              (= (first exp) 'cond) (evcon (rest exp) a)
-                              (= (first exp) 'if) (if (form-eval (-> exp rest first) a)
-                                                    (form-eval (-> exp rest second) a)
-                                                    (form-eval (-> exp rest (nth 2)) a))
-                              :else (form-apply (cons (first exp) (evlis (rest exp) a)) a)))
-    :else (form-apply (cons (first exp) (evlis (rest exp) a)) a)))
+                                (= (first exp) 'lambda) exp
+                                (= (first exp) 'quasiquote) (form-eval-quasi (second exp) a )
+                                (= (first exp) 'unquote) (str "error: unquote can only be called in a quasiquoted form!")
+                                (= (first exp) 'unquote-splicing) (str "error: unquote-splicing can only be called in a quasiquoted form!")
+                                (= (first exp) 'quote) (-> exp rest first)
+                                (= (first exp) 'cond) (evcon (rest exp) a)
+                                (= (first exp) 'if) (if (form-eval (-> exp rest first) a)
+                                                      (form-eval (-> exp rest second) a)
+                                                      (form-eval (-> exp rest (nth 2)) a))
+                                :else (form-apply (cons (first exp) (evlis (rest exp) a)) a)))
+      :else (form-apply (cons (first exp) (evlis (rest exp) a)) a)))
 
 
 (def
@@ -125,8 +135,14 @@
    'else true
    :syntax ['{:name let, :literals (),
               :rules (((let ((var expr) ...) body ...)
-                       ((lambda (var ...) body ...) expr ...)))}]})
-
+                       ((lambda (var ...) body ...) expr ...)))}
+            '{:name and, :literals (),
+              :rules (((and x) x) ((and) true)
+                      ((and x y ...) (if x (and y ...) false)))}
+            '{:name or, :literals (),
+              :rules (((or) true)
+                      ((or x) x)
+                      ((or x y ...) (if x true (or y ...))))}]})
 
 (defn eval-prog-with-env
   [a exprs]
@@ -141,6 +157,7 @@
                                                                    (-> exp rest second second)
                                                                    (-> exp rest second rest rest))
                                                                  (second exp)]
+
                                  (= (first exp) 'define) [(define env
                                                             (second exp)
                                                             (-> exp rest rest first))
@@ -153,3 +170,5 @@
        :evals eval-result})))
 
 (def eval-prog (comp last vals :evals (partial eval-prog-with-env root-env)))
+
+

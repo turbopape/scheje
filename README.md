@@ -40,7 +40,7 @@ environment (implementing some basic symbol definitions and the *let*
 form defined with *define-syntax*). It also does what it takes to only
 show the latest form evaluation in its input program.
 
-Here are two samples:
+Here are some examples:
 
 ```clojure
 (eval-prog  '((define-syntax let
@@ -54,6 +54,32 @@ This example shows how we did to introduce the let form, though it is
 already implemented in the root environment used by scheje, so you
 don't have to define it every time you use *eval-prog*
 
+Analogous to *let*, here's how one can declare *and* using a recursive
+*define-syntax*:
+```clojure
+(eval-prog '((define-syntax and
+               (syntax-rules ()
+                             ((and x) x)
+                             ((and) true)
+                             ((and x y ...) (if x (and y ...) false))))
+             (and true true true  true true false)))
+;;=> false
+```
+Same here, this is already defined in *root-env* so you don't have to
+define it every time you use *eval-prog*. *or* is defined in a same
+way:
+```clojure
+(eval-prog '((define-syntax or
+               (syntax-rules ()
+                             ((or x) x)
+                             ((or) true)
+                             ((or x y ...) (if x true (or y ...)))))
+             (or false false false true false)))
+;;=> true
+```
+
+And, last but not least, here is the must-have *append* function, necessary for
+every decent scheme implementation!
 ```clojure
 (eval-prog '((define append
                (lambda (l1 l2)
@@ -63,8 +89,7 @@ don't have to define it every time you use *eval-prog*
              (append '(1 2 3) '(4 5 6))))
 ;;=> '(1 2 3 4 5 6)
 ```
-The above example is the must-have *append* function, necessary for
-every decent scheme implementation!
+
 
 Also, *quote*, *quasiquote*, *unquote* and *unquote-splicing* are
 supported:
