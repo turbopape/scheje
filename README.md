@@ -60,6 +60,19 @@ don't have to define it every time you use *eval-prog*
 The above example is the must-have *append* function, necessary for
 every decent scheme implementation!
 
+Also, *quote*, *quasiquote*, *unquote* and *unquote-splicing* are
+supported:
+
+```clojure
+(form-eval '(quasiquote
+             (1
+              (+ 1 (unquote-splicing (cdr '(1 2 3)))) 
+              (unquote  (+ 1 a)))) 
+           { 'a 5})
+;;=> (1 (+ 1 2 3) 6)
+```
+
+
 ## License
 
 Copyright © 2016 Rafik Naccache

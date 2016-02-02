@@ -55,6 +55,22 @@
   (assoc a sym
          (form-eval binding a)))
 
+(defn form-eval-quasi
+  [exp a]
+  (cond
+    (atom? exp) exp 
+
+    (or  (= '() exp) 
+         (nil? exp)) '()
+
+    (or (number? exp)
+        (string? exp)
+        (rational? exp)) exp
+    (atom? (first exp)) (cons (first exp) (form-eval-quasi (rest exp) a))
+    (= (-> exp first first) 'unquote)  (cons  (form-eval (-> exp first second ) a) (form-eval-quasi (rest exp) a))
+    (= (-> exp first first) 'unquote-splicing) (into (form-eval (-> exp first second ) a) (form-eval-quasi (rest exp) a) )
+    :else (cons (form-eval-quasi (-> exp first) a) (form-eval-quasi (rest exp ) a))))
+
 (defn form-eval
   [exp a]
   (cond
@@ -81,7 +97,7 @@
                                                                                                             a-match))) 
                                                              :else (if (seq remaining)
                                                                      (recur (rest remaining))
-                                                                     (str  "error in resolving syntax " exp))))))
+                                                                     (str  "Error in resolving syntax " exp))))))
                           
 
                               
@@ -90,7 +106,9 @@
                                   (number? (first exp))) (str "error: The Scalar: `" (first exp) "` Cannot be Applied on " (rest exp) "!!")
 
                               (= (first exp) 'lambda) exp
-                              
+                              (= (first exp) 'quasiquote) (form-eval-quasi (second exp) a )
+                              (= (first exp) 'unquote) (str "error: unquote can only be called in a quasiquoted form!")
+                              (= (first exp) 'unquote-splicing) (str "error: unquote-splicing can only be called in a quasiquoted form!")
                               (= (first exp) 'quote) (-> exp rest first)
                               (= (first exp) 'cond) (evcon (rest exp) a)
                               (= (first exp) 'if) (if (form-eval (-> exp rest first) a)
@@ -135,4 +153,3 @@
        :evals eval-result})))
 
 (def eval-prog (comp last vals :evals (partial eval-prog-with-env root-env)))
-
