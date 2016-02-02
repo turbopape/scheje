@@ -1,5 +1,5 @@
 # scheje 
-
+[! Alt Scheje Logo](https://github.com/turbopape/scheje/blob/master/scheje-logo.jpg)
 Now using the magnificent eval/apply dance (as in page 13 of the
 Lisp 1.5 Manual), *scheje* is a tiny scheme implementation on Top of
 Clojure.
