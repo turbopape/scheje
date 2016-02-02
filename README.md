@@ -1,6 +1,6 @@
 # scheje - A little Scheme on Top of Clojure
 
-<img src="./scheje-logo.png"
+<img src="./scheje-logo.jpg"
  alt="scheje logo" title="The Inky Lambda" align="right" />
  
  >"If you give someone Fortran, he has Fortran. If you give someone Lisp, he has any language he pleases."
