@@ -1,5 +1,11 @@
-# scheje 
-[! Alt Scheje Logo](https://github.com/turbopape/scheje/blob/master/scheje-logo.jpg)
+# scheje - A little Scheme on Top of Clojure
+
+<img src="./scheje-logo.png"
+ alt="scheje logo" title="The Inky Lambda" align="right" />
+ 
+ >"If you give someone Fortran, he has Fortran. If you give someone Lisp, he has any language he pleases."
+ - Guy L. Steele
+ 
 Now using the magnificent eval/apply dance (as in page 13 of the
 Lisp 1.5 Manual), *scheje* is a tiny scheme implementation on Top of
 Clojure.
