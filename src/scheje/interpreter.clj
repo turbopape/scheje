@@ -107,18 +107,24 @@
                                                                                                                 a-match))) 
                                                                :else (if (seq remaining)
                                                                        (recur (rest remaining))
-                                                                       (str  "Error in resolving syntax " exp))))))
+                                                                       (throw (Exception. (str  "Error in resolving syntax in: "
+                                                                                                exp))))))))
                                 
 
                                 
                                 (or (rational? (first exp))
                                     (string? (first exp))
-                                    (number? (first exp))) (str "error: The Scalar: `" (first exp) "` Cannot be Applied on " (rest exp) "!!")
+                                    (number? (first exp))) (throw  (Exception.  (str "error: The Scalar: `" (first exp)
+                                                                                     "` Cannot be Applied on " (rest exp) "!!")))
 
                                 (= (first exp) 'lambda) exp
                                 (= (first exp) 'quasiquote) (form-eval-quasi (second exp) a )
-                                (= (first exp) 'unquote) (str "error: unquote can only be called in a quasiquoted form!")
-                                (= (first exp) 'unquote-splicing) (str "error: unquote-splicing can only be called in a quasiquoted form!")
+                                (= (first exp) 'unquote) (throw (Exception.
+                                                                 (str "error: unquote can only be called "
+                                                                      "in a quasiquoted form!")))
+                                (= (first exp) 'unquote-splicing) (throw (Exception.
+                                                                          (str "error: unquote-splicing can only be"
+                                                                               "called in a quasiquoted form!")))
                                 (= (first exp) 'quote) (-> exp rest first)
                                 (= (first exp) 'cond) (evcon (rest exp) a)
                                 (= (first exp) 'if) (if (form-eval (-> exp rest first) a)
