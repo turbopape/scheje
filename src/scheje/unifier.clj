@@ -174,8 +174,8 @@
             #(kf {:error (str "Clash in " u " and " v)}))))
 
 (defn unify
-  [u v library-env]
-  (let [_  (reset! s library-env)
+  [u v]
+  (let [_  (reset! s {})
         _ (reset! iter 0)]
     ;; I reset the global atoms so
     ;; to have a clean unification for patterns

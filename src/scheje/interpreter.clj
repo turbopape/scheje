@@ -24,9 +24,9 @@
                                             (= f '<) (apply < (into [] r))
                                             (= f '>) (apply > (into [] r))
                                             (= f '<=) (apply <= (into [] r))
-                                            (= f '>=) (apply >= (into [] r)) 
+                                            (= f '>=) (apply >= (into [] r))
                                             :else (form-apply (cons  (form-eval f a) r) a))
-         [([(['lambda parms body]:seq) & args ]:seq)] (form-eval body (pairlis parms   args  a))))
+         [([(['lambda parms body]:seq) & args ]:seq)] (form-eval body (pairlis parms args a))))
 
 (defn evcon
   [conds a]
@@ -68,9 +68,12 @@
         (string? exp)
         (rational? exp)) exp
     (atom? (first exp)) (cons (first exp) (form-eval-quasi (rest exp) a))
-    (= (-> exp first first) 'unquote)  (cons  (form-eval (-> exp first second ) a) (form-eval-quasi (rest exp) a))
-    (= (-> exp first first) 'unquote-splicing) (into (form-eval (-> exp first second ) a) (form-eval-quasi (rest exp) a) )
-    :else (cons (form-eval-quasi (-> exp first) a) (form-eval-quasi (rest exp ) a))))
+    (= (-> exp first first) 'unquote)  (cons  (form-eval (-> exp first second ) a)
+                                              (form-eval-quasi (rest exp) a))
+    (= (-> exp first first) 'unquote-splicing) (into (form-eval (-> exp first second ) a)
+                                                     (form-eval-quasi (rest exp) a) )
+    :else (cons (form-eval-quasi (-> exp first) a)
+                (form-eval-quasi (rest exp ) a))))
 
 
 
@@ -82,13 +85,14 @@
       (or (number? exp)
           (string? exp)
           (rational? exp))  exp
-      (atom? exp) (let [bdng-main (get a exp)]
-                    (if (not (nil? bdng-main )) 
-                      bdng-main
-                      (let [bdng-macros (get (:macros a) exp)]
-                        (if (not (nil? bdng-macros))
-                          bdng-macros
-                          (throw  (Exception.  (str  "No binding found for symbol: " exp)))))))
+      (atom? exp) (let [scope (get-in a [:scopes exp])]
+                    (if (not (nil? scope))
+                      (get scope exp)
+                      (let [from-root (get a exp)]
+                        (if (not (nil? from-root))
+                          from-root
+                          (throw (Exception. (str  "No bindnig found for " exp)))))))
+
       (atom? (first exp))   (let [some-syn (get-syntax (first  exp) (:syntax a))]
                               (cond
                                 (not (nil?  some-syn)) (let [{:keys [rules]} some-syn]  
@@ -96,15 +100,14 @@
                                                            (let [cur-rule (first remaining)
                                                                  cur-pattern (first cur-rule)
                                                                  cur-tpl (second cur-rule)
-                                                                 a-match (unifier/unify cur-pattern exp a)]
+                                                                 a-match (unifier/unify cur-pattern exp)]
                                                              (cond
                                                                (nil? (get a-match :error)) (let [expanded-tpl
                                                                                                  (expander/expand-w-bindings cur-tpl
                                                                                                                              a-match)]
                                                                                              (form-eval expanded-tpl
-                                                                                                        (assoc  a
-                                                                                                                :macros
-                                                                                                                a-match))) 
+                                                                                                        (assoc-in  a
+                                                                                                                   [:scopes expanded-tpl]                                                                                                                  (conj root-env  a-match)))) 
                                                                :else (if (seq remaining)
                                                                        (recur (rest remaining))
                                                                        (throw (Exception. (str  "Error in resolving syntax in: "
@@ -152,23 +155,28 @@
 
 (defn eval-prog-with-env
   [a exprs]
+  
   (loop [remaining exprs
          eval-result {}
          env a]
     (if (seq remaining)
       (let [exp (first remaining)
-            [new-env the-eval] (cond
-                                 (= (first exp) 'define-syntax) [(define-syntax env
-                                                                   (second exp)
-                                                                   (-> exp rest second second)
-                                                                   (-> exp rest second rest rest))
-                                                                 (second exp)]
+            [new-env the-eval] (try
+                                 (cond
+                                   (and (seq? exp)
+                                        (= (first exp) 'define-syntax)) [(define-syntax env
+                                                                           (second exp)
+                                                                           (-> exp rest second second)
+                                                                           (-> exp rest second rest rest))
+                                                                         (second exp)]
 
-                                 (= (first exp) 'define) [(define env
-                                                            (second exp)
-                                                            (-> exp rest rest first))
-                                                          (second exp)]
-                                 :else [env (form-eval exp env)])]
+                                   (and (seq? exp)
+                                        (= (first exp) 'define)) [(define env
+                                                                    (second exp)
+                                                                    (-> exp rest rest first))
+                                                                  (second exp)]
+                                   :else [env (form-eval exp env)])
+                                 (catch Exception e   [env {:error (str "in " exp " : " e)}]))]
         (recur (rest remaining)
                (assoc eval-result exp the-eval)
                new-env))

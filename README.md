@@ -103,6 +103,31 @@ supported:
 ;;=> (1 (+ 1 2 3) 6)
 ```
 
+## Macros Experimental Hygiene
+To prevent symbol capture, when expanded, each expression's symbols
+are stored in its own scope. This hopefully avoids name clash:
+
+In the following example, a is defined at the root-env, but "inner" a
+is retruned from the *let* macro:
+```clojure
+(eval-prog '((define a "outer")
+             (let ((x (and false false))
+                   (a "inner"))
+               (if x "_" a))))
+;;=> "inner"
+```
+
+If we access a symbol outside the macro, we get its root binding:
+
+```clojure
+(eval-prog '((define a "outer")
+             (let ((x (and false false))
+                   (a "inner"))
+               (if x "_" a))
+             a))
+;;=> "outer"
+```
+This still needs testing.
 
 ## License
 

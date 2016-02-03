@@ -1,6 +1,15 @@
 # Change Log
 
-## 0.2.1 [2016-02-02]
+## [0.2.2] - [2016-02-03]
+###Added
+- Exception throwing and handling in evaluation
+
+###Fixed
+- Enhanced scoping of symbols to avoid clashes caused by symbols
+  introduced by macros.
+
+
+## [0.2.1] - [2016-02-02]
 ###Added
 - quasiquote, unquote, unquote-splicing, and, or 
 
@@ -8,7 +17,7 @@
 - Now vars used in macros are stored in their proper scope, so they
   don't pile up across successive calls to same macros.
 
-## [0.2.0][2016-02-01]
+## [0.2.0] - [2016-02-01]
 ### Changed
 - Now *scheje* uses eval/apply approach. More maintainable, it can now
   also be used as a ClojureScript library, as it evals lists of
@@ -21,7 +30,7 @@
   *syntax-rules* templates. Now, it uses unification to find relevant
   patterns to apply to input, and rules are stored in the execution environment.
 
-## 0.1.0 - 2015-12-11	
+## [0.1.0] - [2015-12-11]	
 
 ### Added
 - First version of the interpreter, using Clojure macros. Mainly a
