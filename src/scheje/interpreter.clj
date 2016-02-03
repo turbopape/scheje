@@ -5,6 +5,22 @@
             [scheje.expander :as expander]))
 
 
+(def
+  root-env
+  {'true true
+   'false false
+   'else true
+   :syntax ['{:name let, :literals (),
+              :rules (((let ((var expr) ...) body ...)
+                       ((lambda (var ...) body ...) expr ...)))}
+            '{:name and, :literals (),
+              :rules (((and x) x) ((and) true)
+                      ((and x y ...) (if x (and y ...) false)))}
+            '{:name or, :literals (),
+              :rules (((or) true)
+                      ((or x) x)
+                      ((or x y ...) (if x true (or y ...))))}]})
+
 
 (declare form-eval)
 
@@ -137,21 +153,7 @@
       :else (form-apply (cons (first exp) (evlis (rest exp) a)) a)))
 
 
-(def
-  root-env
-  {'true true
-   'false false
-   'else true
-   :syntax ['{:name let, :literals (),
-              :rules (((let ((var expr) ...) body ...)
-                       ((lambda (var ...) body ...) expr ...)))}
-            '{:name and, :literals (),
-              :rules (((and x) x) ((and) true)
-                      ((and x y ...) (if x (and y ...) false)))}
-            '{:name or, :literals (),
-              :rules (((or) true)
-                      ((or x) x)
-                      ((or x y ...) (if x true (or y ...))))}]})
+
 
 (defn eval-prog-with-env
   [a exprs]
