@@ -103,7 +103,7 @@ supported:
 ;;=> (1 (+ 1 2 3) 6)
 ```
 
-## Macros Experimental Hygiene
+## Lexical Scoping
 To prevent symbol capture, when expanded, each expression's symbols
 are stored in its own scope. This hopefully avoids name clash:
 
