@@ -103,9 +103,11 @@ supported:
 ;;=> (1 (+ 1 2 3) 6)
 ```
 
-## Lexical Scoping
-To prevent symbol capture, when expanded, each expression's symbols
-are stored in its own scope. This hopefully avoids name clash:
+## Lexical Scoping in *let* Macros
+
+To prevent symbol capture when using the *let* macro, when expanded,
+each *let* introduced expression's symbols are stored in its own
+scope. This avoids name clash:
 
 In the following example, a is defined at the root-env, but "inner" a
 is retruned from the *let* macro:
@@ -131,10 +133,13 @@ If we access a symbol outside the macro, we get its root binding:
 
 Inspired by
 [KFFD](http://web.cs.ucdavis.edu/~devanbu/teaching/260/kohlbecker.pdf)
-Algorithm. Now Scheje appends a timestamp to each symbol in expanded
-form, and in eval, tries to evaluate symbols without timestamps
-(original name) as to force capture of symbols (i.e, if the symbol was
-originally meant to be a function call, a keyword, etc...).
+Algorithm. Now Scheje appends a timestamp with respect to the
+iteration in which every form is being expanded, thus preventing from
+inadvertendly capturing symbols across expansion.
+If some symbols with timestamps could not be evaluated, Scheje tries to
+evaluate their "root" form, i.e, looks if their original name isn't
+bound in the environment. This kind of forces capture of such symbols,
+as to see if they were intended to be passed as globals, for instance.
 
 For instance, these two exmaples work properly:
 ```clojure

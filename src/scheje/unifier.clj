@@ -106,8 +106,7 @@
    (fn[x]
      (if (and  (not (= x '...))
                (symbol? x))
-       (let [sb-idx (get-symbol-idx (name  x))
-             ]
+       (let [sb-idx (get-symbol-idx (name  x))]
          (symbol  (str (:sym sb-idx) "%%" @iter )))
        x))
    p))
