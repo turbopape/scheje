@@ -7,18 +7,28 @@
 
 (def
   root-env
-  {'true true
+  {
+   'true true
    'false false
    'else true
-   :keywords ['lambda 'if 'cons 'car 'cdr 'null? 'atom? '+ '- 'eq? '< '<= '> '>= '/ '* 'false 'true 'else]
+   :keywords ['= 'cond 'lambda 'if 'cons 'car 'cdr 'null? 'atom? '+ '- 'eq? '< '<= '> '>= '/ '* 'false 'true 'else]
    :syntax ['{:name let, :literals (),
               :rules (((let () body ... ) ((lambda() body ...)))
-                      ((let ((var expr) ...) body ...)
-                       ((lambda (var ...) body ...) expr ...)))}
+                      ((let ((var expr) ...) body ...) ((lambda (var ...) body ...) expr ...))
+                      ((let let-name ((var expr)...) body ... ) (letrec ((let-name (lambda (var ...) body ...)))
+                                                                        (let-name expr ...))))}
+
+            '{:name letrec, :literals (),
+              :rules (((letrec bindings body) (let bindings body)))}
+            
             '{:name let*, :literals (),
               :rules (((let* () body ...) (let () body ...))
                       ((let* (binding) body ...) (let (binding) body ...))
                       ((let* (binding bnext ...) body ...) (let (binding) (let* (bnext ...) body ...))))}
+
+            '{:name letrec*, :literals (),
+              :rules (((letrec* bindings body) (let* bindings body)))}
+            
             '{:name and, :literals (),
               :rules (((and x) x) ((and) true)
                       ((and x y ...) (if x (and y ...) false)))}
@@ -35,6 +45,8 @@
   [exp a]
   (match [exp]
          [([(f :guard atom?) & r] :seq )] (cond
+                                            (= f 'eq?)(apply = (into [] r))
+                                            (= f '=) (apply = (into [] r))
                                             (= f 'null?) (=  '(()) r)                                          
                                             (= f 'car) (-> r first first)
                                             (= f 'cdr) (-> r first rest )
@@ -78,7 +90,7 @@
     (let [exists? (get a sym)]
       (if (not (nil? exists?))
         (define a sym binding)
-        (throw (Exception. (str "set! cant find symbol: " sym ))))))
+        (throw (Exception. (str "set! can't find symbol: " sym ))))))
   
 (defn define
   [a

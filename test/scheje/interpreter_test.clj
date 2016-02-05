@@ -115,3 +115,10 @@
   (testing "let* works?"
     (is (= 10 (eval-prog '((let* ((a 5)(b a))
                              (+ b a))))))))
+
+(deftest named-let
+  (testing "named let works?"
+    (is (= 6 (eval-prog '((let f ((x 3))
+                               (cond 
+                                 ((= x 0) 1 )
+                                 (else (* x  (f (- x 1))))))))))))
