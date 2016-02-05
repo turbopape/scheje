@@ -1,4 +1,5 @@
-(ns scheje.tools)
+(ns scheje.tools
+  (:require [clojure.walk :as w]))
 
 
 (defn get-syntax
@@ -22,3 +23,24 @@
 (defn pairlis
   [x y z]
   (into z  (map (fn [k v] [k v]) x y )))
+
+(defn is-valid-symbol?
+  [s]
+  (not (some #{ \( \) \[ \] \{ \} \" \, \' \` \; \# \| \\  }
+             (name s))))
+
+(defn get-symbols
+  [exp]
+  (let [res (atom '())]
+    (w/postwalk
+     (fn[x]
+       (when   (symbol? x)
+         (swap! res conj x)))
+     exp)
+    @res))
+
+
+(defn is-exp-valid?
+ [exp]
+
+ (every? is-valid-symbol? (get-symbols exp)))

@@ -62,8 +62,8 @@
           (some #{x} (->> (get env :keywords)))
           (some #{x} (->> (get env :syntax)
                           (map :name )))
-          (some #{\%} (name  x))) x
-         :else (symbol  (str  (name x) "%%" ts)))
+          (some #{\#} (name  x))) x
+         :else (symbol  (str  (name x) \# ts)))
        x))
    exp))
 
@@ -82,19 +82,22 @@
           (or (= '_ u)
               (= u v)) #(ks @s) ;; The terms are equal, nothing to do, we
           ;; run the success function over the same content of s
-          (literal? u @s) ;; u is different than v, and it is a literal, so this is a match error
-          #(kf {:error (str "literal: " u " matched with wrong literal: " v )})
+
+          (literal? u @s) #(kf {:error (str "literal: " u " mismatch - with: " v )})
+          ;; u is different than v, and it is a literal, so this is a match error
+
           (occurs? u v) #(kf {:error  (str  "Cycle occuring between " u " and " v)}) ;; Occur Check error
+
           :default #(ks  (swap! s
                                 assoc
                                 u
-                                (dynamic-free-symbols  v ts env ))))))))
+                                (dynamic-free-symbols v ts env ))))))))
 ;; Else, We found a new substitution
 ;; to be added to our substitutions atom s
 
 (defn get-symbol-idx
   [s]
-  (let [parsed  (clojure.string/split s #"%%")]
+  (let [parsed  (clojure.string/split s #"#")]
     (if (> (count parsed) 1)
       {:sym (first parsed)
        :idx (. Integer parseInt (last parsed))}
@@ -107,7 +110,7 @@
      (if (and  (not (= x '...))
                (symbol? x))
        (let [sb-idx (get-symbol-idx (name  x))]
-         (symbol  (str (:sym sb-idx) "%%" @iter )))
+         (symbol  (str (:sym sb-idx) \# @iter )))
        x))
    p))
 

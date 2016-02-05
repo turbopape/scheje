@@ -87,7 +87,7 @@
                                (define-syntax or2
                                  (syntax-rules ()
                                                ((or2 e1 e2) (let ((t e1)) (if t t e2) ))))
-                               (let ((t true)) (or2 false t ))
+                               (let ((t true)) (or2 false t))
                                ))]
       (is (= true clash-1)))))
 

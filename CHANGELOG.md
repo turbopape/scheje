@@ -6,6 +6,8 @@
 - more tests
 
 ###Fixed
+- Now symbols containing reserved characters can't be used. This fixes
+corner cases for macro expansion.
 
 ## [0.2.3] - [2016-02-05]
 ###Added
