@@ -1,4 +1,4 @@
-(defproject scheje "0.2.2"
+(defproject scheje "0.2.3"
   :description "A Scheme Interpreter on Top of Clojure"
   :url "http://scheje.github.io"
   :license {:name "MIT"

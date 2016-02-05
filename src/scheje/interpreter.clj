@@ -10,6 +10,7 @@
   {'true true
    'false false
    'else true
+   :keywords ['if 'cons 'car 'cdr 'null? 'atom? '+ '- 'eq? '< '<= '> '>= '/ '* 'false 'true 'else]
    :syntax ['{:name let, :literals (),
               :rules (((let ((var expr) ...) body ...)
                        ((lambda (var ...) body ...) expr ...)))}
@@ -21,6 +22,7 @@
                       ((or x) x)
                       ((or x y ...) (if x true (or y ...))))}]})
 
+(def ts (atom 0))
 
 (declare form-eval)
 
@@ -107,7 +109,11 @@
                       (let [from-root (get a exp)]
                         (if (not (nil? from-root))
                           from-root
-                          (throw (Exception. (str  "No bindnig found for " exp)))))))
+                          (if (some #{'\%} (name  exp) )
+                          
+                            (form-eval  (symbol  (:sym  (unifier/get-symbol-idx (name  exp)))) a)
+                            ;; maybe a macro symbol that we want captured, a function name?
+                            (throw (Exception. (str  "No bindnig found for " exp))))))))
 
       (atom? (first exp))   (let [some-syn (get-syntax (first  exp) (:syntax a))]
                               (cond
@@ -116,7 +122,7 @@
                                                            (let [cur-rule (first remaining)
                                                                  cur-pattern (first cur-rule)
                                                                  cur-tpl (second cur-rule)
-                                                                 a-match (unifier/unify cur-pattern exp)]
+                                                                 a-match (unifier/unify cur-pattern exp (swap! ts inc) a)]
                                                              (cond
                                                                (nil? (get a-match :error)) (let [expanded-tpl
                                                                                                  (expander/expand-w-bindings cur-tpl
@@ -152,12 +158,8 @@
                                 :else (form-apply (cons (first exp) (evlis (rest exp) a)) a)))
       :else (form-apply (cons (first exp) (evlis (rest exp) a)) a)))
 
-
-
-
 (defn eval-prog-with-env
-  [a exprs]
-  
+  [a exprs]  
   (loop [remaining exprs
          eval-result {}
          env a]
@@ -186,5 +188,3 @@
        :evals eval-result})))
 
 (def eval-prog (comp last vals :evals (partial eval-prog-with-env root-env)))
-
-

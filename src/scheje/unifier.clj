@@ -36,6 +36,7 @@
 
 (def iter (atom 0))
 
+(def scope (atom 0))
 
 (defn apply-subst
   [u]
@@ -51,15 +52,29 @@
 
 (declare uni) ;; uni declaration
 
+(defn dynamic-free-symbols
+  [exp ts env]
+  (w/postwalk
+   (fn[x]
+     (if (symbol? x)
+       (cond
+         (or
+          (some #{x} (->> (get env :keywords)))
+          (some #{x} (->> (get env :syntax)
+                          (map :name )))
+          (some #{\%} (name  x))) x
+         :else (symbol  (str  (name x) "%%" ts)))
+       x))
+   exp))
 
 (defn try-subst
-  [u v ks kf]
+  [ts env u v ks kf]
   (let [u (apply-subst u)] ;; First, we exchange u for any known
     ;; substitute, so we don't unify the same
     ;; thing with two different terms
 
     (if (not (symbol? u)) ;;This is not a symbol, it is an expression
-      #(uni u v ks kf)    ;; Launch uni, the "main" expressions unifier
+      #(uni ts env u v ks kf)    ;; Launch uni, the "main" expressions unifier
       (let [v (apply-subst v )] ;; Same logic for right hand expression
         ;; term
         (cond
@@ -73,7 +88,8 @@
           :default #(ks  (swap! s
                                 assoc
                                 u
-                                v))))))) ;; Else, We found a new substitution
+                                (dynamic-free-symbols  v ts env ))))))))
+;; Else, We found a new substitution
 ;; to be added to our substitutions atom s
 
 (defn get-symbol-idx
@@ -99,12 +115,12 @@
 
 
 (defn uni
-  [u v ks kf]
+  [ts env u v ks kf]
   (swap! iter inc)
   ;; First of all, I inc the global iter atom; so
   ;; I can get proper symbol name for nested ellipsis variables
   (cond
-    (symbol? u) #(try-subst u v  ks kf) ;; Try to find substitutions if the left hand
+    (symbol? u) #(try-subst ts env u v  ks kf) ;; Try to find substitutions if the left hand
     ;; term is a symbol 
     
 
@@ -122,7 +138,9 @@
                                                                #(ks @s)
                                                                  (fn[]
                                                                    (let [n-exp (inc-symbols u)]
-                                                                     (uni n-exp
+                                                                     (uni ts
+                                                                          env
+                                                                          n-exp
                                                                           (first v)
                                                                           (fn[_]
                                                                             (parse-ellipsis
@@ -130,10 +148,12 @@
                                                                              (next v)
                                                                              r))
                                                                           (if (seq r) (fn[_]
-                                                                                        (uni   r
-                                                                                               v
-                                                                                               ks
-                                                                                               kf))
+                                                                                        (uni ts
+                                                                                             env
+                                                                                             r
+                                                                                             v
+                                                                                             ks
+                                                                                             kf))
                                                                               #(ks @s)))))))]
                                                      (trampoline parse-ellipsis
                                                                  exp
@@ -151,6 +171,8 @@
                                                                        (fn[] ;; else, recurse over uni
                                                                          (cond
                                                                            (= '... (second u)) (uni
+                                                                                                ts
+                                                                                                env
                                                                                                 u
                                                                                                 v
                                                                                                 (fn[_]
@@ -158,7 +180,9 @@
                                                                                                                     (next v)))
                                                                                                 kf)
                                                                            (= '... (first u) ) #(ks @s)
-                                                                           :else (uni (first u)    
+                                                                           :else (uni ts
+                                                                                      env
+                                                                                      (first u)    
                                                                                       (first v)                                        
                                                                                       (fn[_]
                                                                                         (internal-symbols (next u)
@@ -174,12 +198,14 @@
             #(kf {:error (str "Clash in " u " and " v)}))))
 
 (defn unify
-  [u v]
+  [u v ts env]
   (let [_  (reset! s {})
         _ (reset! iter 0)]
     ;; I reset the global atoms so
     ;; to have a clean unification for patterns
     (trampoline uni
+                ts
+                env
                 u
                 v
                 identity
