@@ -13,7 +13,7 @@
       (is (= true clash-1)))))
 
 (deftest symbol-clash-2
-  (testing "Symbols clash 1 in pages 2,3 of http://www.cs.indiana.edu/~dyb/pubs/bc-syntax-case.pdf ")
+  (testing "Symbols clash 2 in pages 2,3 of http://www.cs.indiana.edu/~dyb/pubs/bc-syntax-case.pdf ")
   (let [clash-2 (eval-prog '(
                              (let ((if (lambda(x y z) "oops")))
                                (let ((g false))
