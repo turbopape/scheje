@@ -139,10 +139,11 @@ originally meant to be a function call, a keyword, etc...).
 For instance, these two exmaples work properly:
 ```clojure
 (eval-prog '(
-            (let ((if (lambda(x y z) "oops")))
-                    (let ((g false))
-                      (if g g false)))
-            ))
+             (define-syntax or2
+               (syntax-rules ()
+                             ((or2 e1 e2) (let ((t e1)) (if t t e2) ))))
+             (let ((t true)) (or2 false t ))
+             ))
 ;;=> true
 ```
 and 
