@@ -81,7 +81,6 @@
                                 a))))))
 
 
-
 (deftest macros-hygiene-1
   (testing "Symbols clash 1 in pages 2,3 of http://www.cs.indiana.edu/~dyb/pubs/bc-syntax-case.pdf "
     (let [clash-1 (eval-prog '(
@@ -101,4 +100,18 @@
                              ))]
     (is (= false clash-2))))
 
+(deftest sym-set!-1
+  (testing "sym-set! works"
+    (is (= 4 (eval-prog '((define a 5)
+                          (set! a 4)
+                          a))))))
 
+(deftest sym-set!-2
+  (testing "sym-set! fails"
+    (is (not (nil? (:error (eval-prog '((set! a 4)
+                                        a))))))))
+
+(deftest let*-test
+  (testing "let* works?"
+    (is (= 10 (eval-prog '((let* ((a 5)(b a))
+                             (+ b a))))))))

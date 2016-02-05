@@ -134,8 +134,8 @@
                            [([exp '... & r] :seq)] (letfn [(parse-ellipsis
                                                              [u v r]
                                                              (if (nil? v)
-                                                               #(ks @s)
-                                                                 (fn[]
+                                                               (fn[& _] (ks @s))
+                                                                 (fn[& _]
                                                                    (let [n-exp (inc-symbols u)]
                                                                      (uni ts
                                                                           env
@@ -146,14 +146,14 @@
                                                                              n-exp
                                                                              (next v)
                                                                              r))
-                                                                          (if (seq r) (fn[_]
+                                                                          (if (seq r) (fn[& _]
                                                                                         (uni ts
                                                                                              env
                                                                                              r
                                                                                              v
                                                                                              ks
                                                                                              kf))
-                                                                              #(ks @s)))))))]
+                                                                              (fn [& _] (ks @s))))))))]
                                                      (trampoline parse-ellipsis
                                                                  exp
                                                                  v

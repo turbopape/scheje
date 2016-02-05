@@ -1,4 +1,10 @@
 # Change Log
+##[0.2.4] - [2016-02-06]
+###Added
+- *set!*, *let**
+- more tests
+
+###Fixed
 
 ## [0.2.3] - [2016-02-05]
 ###Added

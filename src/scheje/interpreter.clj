@@ -12,8 +12,13 @@
    'else true
    :keywords ['lambda 'if 'cons 'car 'cdr 'null? 'atom? '+ '- 'eq? '< '<= '> '>= '/ '* 'false 'true 'else]
    :syntax ['{:name let, :literals (),
-              :rules (((let ((var expr) ...) body ...)
+              :rules (((let () body ... ) ((lambda() body ...)))
+                      ((let ((var expr) ...) body ...)
                        ((lambda (var ...) body ...) expr ...)))}
+            '{:name let*, :literals (),
+              :rules (((let* () body ...) (let () body ...))
+                      ((let* (binding) body ...) (let (binding) body ...))
+                      ((let* (binding bnext ...) body ...) (let (binding) (let* (bnext ...) body ...))))}
             '{:name and, :literals (),
               :rules (((and x) x) ((and) true)
                       ((and x y ...) (if x (and y ...) false)))}
@@ -56,7 +61,6 @@
   [exps a]
   (map #(form-eval % a) exps))
 
-
 (defn define-syntax
   [a
    syn-name
@@ -66,6 +70,16 @@
                                 :literals literals
                                 :rules  pattern-rules}))
 
+
+(defn sym-set!
+  [a
+   sym
+   binding]
+    (let [exists? (get a sym)]
+      (if (not (nil? exists?))
+        (define a sym binding)
+        (throw (Exception. (str "set! cant find symbol: " sym ))))))
+  
 (defn define
   [a
    sym
@@ -172,7 +186,12 @@
                                                                            (-> exp rest second second)
                                                                            (-> exp rest second rest rest))
                                                                          (second exp)]
-
+                                   (and (seq? exp)
+                                        (= (first exp) 'set!)) [(sym-set! env
+                                                                      (second exp)
+                                                                      (-> exp rest rest first))
+                                                                (second exp)]
+                                   
                                    (and (seq? exp)
                                         (= (first exp) 'define)) [(define env
                                                                     (second exp)
