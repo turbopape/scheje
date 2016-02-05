@@ -127,8 +127,34 @@ If we access a symbol outside the macro, we get its root binding:
              a))
 ;;=> "outer"
 ```
-This still needs testing.
+## Hygienic Macros 
 
+Inspired by
+[KFFD](http://web.cs.ucdavis.edu/~devanbu/teaching/260/kohlbecker.pdf)
+Algorithm. Now Scheje appends a timestamp to each symbol in expanded
+form, and in eval, tries to evaluate symbols without timestamps
+(original name) as to force capture of symbols (i.e, if the symbol was
+originally meant to be a function call, a keyword, etc...).
+
+For instance, these two exmaples work properly:
+```clojure
+(eval-prog '(
+            (let ((if (lambda(x y z) "oops")))
+                    (let ((g false))
+                      (if g g false)))
+            ))
+;;=> true
+```
+and 
+
+```clojure
+(eval-prog '(
+            (let ((if (lambda(x y z) "oops")))
+              (let ((g false))
+                (if g g false)))
+            ))
+;;=> false
+```
 ## License
 
 Copyright © 2016 Rafik Naccache

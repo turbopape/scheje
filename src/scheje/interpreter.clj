@@ -10,7 +10,7 @@
   {'true true
    'false false
    'else true
-   :keywords ['if 'cons 'car 'cdr 'null? 'atom? '+ '- 'eq? '< '<= '> '>= '/ '* 'false 'true 'else]
+   :keywords ['lambda 'if 'cons 'car 'cdr 'null? 'atom? '+ '- 'eq? '< '<= '> '>= '/ '* 'false 'true 'else]
    :syntax ['{:name let, :literals (),
               :rules (((let ((var expr) ...) body ...)
                        ((lambda (var ...) body ...) expr ...)))}
@@ -93,8 +93,6 @@
     :else (cons (form-eval-quasi (-> exp first) a)
                 (form-eval-quasi (rest exp ) a))))
 
-
-
 (defn form-eval
   [exp a]
     (cond
@@ -113,7 +111,8 @@
                           
                             (form-eval  (symbol  (:sym  (unifier/get-symbol-idx (name  exp)))) a)
                             ;; maybe a macro symbol that we want captured, a function name?
-                            (throw (Exception. (str  "No bindnig found for " exp))))))))
+                            (throw (Exception. (str  "No binding found for " exp)))
+                            )))))
 
       (atom? (first exp))   (let [some-syn (get-syntax (first  exp) (:syntax a))]
                               (cond

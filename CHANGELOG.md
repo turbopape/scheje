@@ -1,5 +1,9 @@
 # Change Log
 
+## [0.2.3] - [2016-02-05]
+###Added
+- Hygienic macro-expansion inspired by the [KFFD algorithm](http://web.cs.ucdavis.edu/~devanbu/teaching/260/kohlbecker.pdf)
+
 ## [0.2.2] - [2016-02-03]
 ###Added
 - Exception throwing and handling in evaluation
@@ -7,7 +11,6 @@
 ###Fixed
 - Enhanced scoping of symbols to avoid clashes caused by symbols
   introduced by macros.
-
 
 ## [0.2.1] - [2016-02-02]
 ###Added
