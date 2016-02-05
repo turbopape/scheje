@@ -1,5 +1,5 @@
 # scheje - A little Scheme on Top of Clojure
-
+[![Clojars Project](https://img.shields.io/clojars/v/scheje.svg)](https://clojars.org/scheje)
 <img src="./scheje-logo.jpg" size="50%"
  alt="scheje logo" title="The Inky Lambda" align="right" />
  
