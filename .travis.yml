@@ -3,6 +3,5 @@ lein: lein2
 script: lein test
 jdk:
   - openjdk7
-  - openjdk8
   - oraclejdk7
   - oraclejdk8
