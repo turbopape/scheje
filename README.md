@@ -2,6 +2,7 @@
 [![License MIT](https://img.shields.io/badge/License-MIT-blue.svg)](http://opensource.org/licenses/MIT)
 [![Build Status](https://travis-ci.org/turbopape/scheje.svg?branch=master)](https://travis-ci.org/turbopape/scheje)
 [![Clojars Project](https://img.shields.io/clojars/v/scheje.svg)](https://clojars.org/scheje)
+[![Gratipay](https://img.shields.io/gratipay/turbopape.svg)](https://gratipay.com/turbopape/)
 <img src="./scheje-logo.jpg" size="50%"
  alt="scheje logo" title="The Inky Lambda" align="right" />
  
