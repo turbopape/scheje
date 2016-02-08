@@ -2,40 +2,8 @@
   (:require [clojure.core.match :refer [match]]
             [scheje.tools :refer :all] 
             [scheje.unifier :as unifier]
-            [scheje.expander :as expander]))
-
-
-(def
-  root-env
-  {
-   'true true
-   'false false
-   'else true
-   :keywords ['= 'cond 'lambda 'if 'cons 'car 'cdr 'null? 'atom? '+ '- 'eq? '< '<= '> '>= '/ '* 'false 'true 'else]
-   :syntax ['{:name let, :literals (),
-              :rules (((let () body ... ) ((lambda() body ...)))
-                      ((let ((var expr) ...) body ...) ((lambda (var ...) body ...) expr ...))
-                      ((let let-name ((var expr)...) body ... ) (letrec ((let-name (lambda (var ...) body ...)))
-                                                                        (let-name expr ...))))}
-
-            '{:name letrec, :literals (),
-              :rules (((letrec bindings body) (let bindings body)))}
-            
-            '{:name let*, :literals (),
-              :rules (((let* () body ...) (let () body ...))
-                      ((let* (binding) body ...) (let (binding) body ...))
-                      ((let* (binding bnext ...) body ...) (let (binding) (let* (bnext ...) body ...))))}
-
-            '{:name letrec*, :literals (),
-              :rules (((letrec* bindings body) (let* bindings body)))}
-            
-            '{:name and, :literals (),
-              :rules (((and x) x) ((and) true)
-                      ((and x y ...) (if x (and y ...) false)))}
-            '{:name or, :literals (),
-              :rules (((or) true)
-                      ((or x) x)
-                      ((or x y ...) (if x true (or y ...))))}]})
+            [scheje.expander :as expander]
+            [scheje.library :refer :all]))
 
 (def ts (atom 0))
 
@@ -44,6 +12,7 @@
 (defn form-apply
   [exp a]
   (match [exp]
+         ;; The Core Functions 
          [([(f :guard atom?) & r] :seq )] (cond
                                             (= f 'eq?)(apply = (into [] r))
                                             (= f '=) (apply = (into [] r))
@@ -52,6 +21,7 @@
                                             (= f 'cdr) (-> r first rest )
                                             (= f 'cons) (cons (first r) (second r))
                                             (= f 'atom?) (atom? (first r))
+                                            (= f 'display) (apply println (into [] r))
                                             (= f '+) (apply + (into [] r))
                                             (= f '-) (apply - (into [] r))
                                             (= f '/) (apply / (into [] r))
@@ -182,22 +152,16 @@
                               :else (form-apply (cons (first exp) (evlis (rest exp) a)) a)))
       :else (form-apply (cons (first exp) (evlis (rest exp) a)) a)))
 
-(defn eval-prog-with-env
-  [a exprs]  
-  (loop [remaining exprs
-         eval-result {}
-         env a]
-    (if (seq remaining)
-      (let [exp (first remaining)
-            [new-env the-eval] (if (is-exp-valid? exp)
-                                   (try
-                                      (cond
-                                        (and (seq? exp)
-                                             (= (first exp) 'define-syntax)) [(define-syntax env
-                                                                                (second exp)
-                                                                                (-> exp rest second second)
-                                                                                (-> exp rest second rest rest))
-                                                                              (second exp)]
+(defn eval-exp-with-env!
+  [env exp]
+  (if (is-exp-valid? exp) (try
+                            (cond
+                              (and (seq? exp)
+                                   (= (first exp) 'define-syntax)) [(define-syntax env
+                                                                      (second exp)
+                                                                      (-> exp rest second second)
+                                                                      (-> exp rest second rest rest))
+                                                                    (second exp)]
 
                                         (and (seq? exp)
                                              (= (first exp) 'set!)) [(sym-set! env
@@ -214,7 +178,18 @@
                                         
                                         :else [env (form-eval exp env)])
                                       (catch Exception e [env {:error (str "in " exp " : " e)}]))
-                                   [env {:error (str "Invalid Symbols in exp: " exp)}])]
+                                   [env {:error (str "Invalid Symbols in exp: " exp)}]))
+
+
+
+(defn eval-prog-with-env!
+  [a exprs]  
+  (loop [remaining exprs
+         eval-result {}
+         env a]
+    (if (seq remaining)
+      (let [exp (first remaining)
+            [new-env the-eval]  (eval-exp-with-env! env exp)]
         (if (nil? (:error the-eval))
           (recur (rest remaining)
                  (assoc eval-result exp the-eval)
@@ -223,4 +198,5 @@
       {:env env
        :evals eval-result})))
 
-(def eval-prog (comp last vals :evals (partial eval-prog-with-env root-env)))
+(def eval-prog (comp last vals :evals (partial eval-prog-with-env! root-env)))
+

@@ -30,7 +30,6 @@ scheje as a library on top of ClojureScript as well.
 The main interpretation function is *form-eval* in the *interpreter*
 name-space.
 
-
 You give it a form and an environment, and you get your evaluation:
 ```clojure
 (form-eval '(+ x y) '{x 1 y 2})
@@ -105,6 +104,8 @@ supported:
            { 'a 5})
 ;;=> (1 (+ 1 2 3) 6)
 ```
+Also, named let, let*, and many more are available. Please refer to
+the test files for the interpreter namespace to see possible uses.
 
 ## Lexical Scoping in *let* Macros
 
@@ -164,7 +165,15 @@ and
             ))
 ;;=> false
 ```
-## License
+### A little REPL
+Now a **REPL** namespace is shipped, exposing a little REPL permitting
+to evaluating expressions and loading files. If you want to play with
+it, just clone the repo and launch:
+```shell
+lein run
+```
 
+
+## License
 Copyright © 2016 Rafik Naccache
 Distributed under the terms of the The MIT License.
