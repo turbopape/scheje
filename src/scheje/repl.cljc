@@ -1,42 +1,11 @@
 (ns scheje.repl
   (:require [scheje.interpreter :refer :all]
-            [scheje.library :refer :all])
+            [scheje.library :refer :all]
+            [scheje.tools :refer :all])
   (:gen-class))
 
 (def exec-env (atom root-env))
 (def current-sexp (atom ""))
-(defn get-sexps
-  [s]
-  (loop [remaining s
-         level 0
-         result []
-         current-sexp ""]
-    (if (seq remaining)
-      (let [cur-char (first remaining)]
-        (if (not (= \newline cur-char))
-          (let [cur-level (cond
-                            (= cur-char \() (inc level)
-                            (= cur-char \)) (dec level)
-                            :else level)
-
-                result (if (zero? cur-level)
-                         (conj result (str  current-sexp cur-char))
-                         result)
-                
-                new-current-sexp (if (zero? cur-level)
-                                   ""
-                                   (str current-sexp cur-char))]
-
-            (recur (rest remaining)
-                   cur-level
-                   result
-                   new-current-sexp))
-          (recur (rest remaining)
-                 level
-                 result
-                 current-sexp)))
-      result)))
-
 
 
 (defn -main 
@@ -54,7 +23,7 @@
           (try
             (cond
               (= ",r" switch) (do  (reset! exec-env root-env) (println "Reloaded Base Environment!")) 
-              (= ",l" switch) (let [scm-prog (map read-string (get-sexps (slurp  (second input-commands))))
+              (= ",l" switch) (let [scm-prog (load-prog-from-file (second input-commands))
                                     file-eval (eval-prog-with-env! @exec-env scm-prog)
                                     last-eval (-> file-eval  :evals vals last)]
                                 (if (nil? (:error last-eval))
@@ -67,7 +36,7 @@
                 (let [[new-env the-eval] (eval-exp-with-env! @exec-env (clojure.tools.reader/read-string input) )]
                   (if (nil? (:error the-eval))
                     (do
-                      (reset! exec-env new-env)()
+                      (reset! exec-env new-env)
                       (println ";=> " the-eval))
                     (println ";Error: " (:error the-eval))))))
             (catch  Exception e (println ";Error: " (str e))))

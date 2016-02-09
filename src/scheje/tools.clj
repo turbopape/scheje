@@ -44,3 +44,42 @@
  [exp]
 
  (every? is-valid-symbol? (get-symbols exp)))
+
+(defn get-sexps
+  [s]
+  (loop [remaining s
+         level 0
+         result []
+         current-sexp ""]
+    (if (seq remaining)
+      (let [cur-char (first remaining)]
+        (if (not (= \newline cur-char))
+          (let [cur-level (cond
+                            (= cur-char \() (inc level)
+                            (= cur-char \)) (dec level)
+                            :else level)
+
+                result (if (zero? cur-level)
+                         (conj result (str  current-sexp cur-char))
+                         result)
+                
+                new-current-sexp (if (zero? cur-level)
+                                   ""
+                                   (str current-sexp cur-char))]
+
+            (recur (rest remaining)
+                   cur-level
+                   result
+                   new-current-sexp))
+          (recur (rest remaining)
+                 level
+                 result
+                 current-sexp)))
+      result)))
+
+
+(defn load-prog-from-file
+  [f]
+  (->> (slurp f)
+       (get-sexps)
+       (map read-string)))
