@@ -1,4 +1,10 @@
 # Change Log
+##[0.2.5] - [2016-02-09]
+###Added
+- ClojureScript support using reader conditionals
+- a REPL based on node.js
+
+
 ##[0.2.5] - [2016-02-08]
 ###Added
 - Now you can play around with *scheje* using its little incorporated REPL.

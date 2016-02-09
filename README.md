@@ -157,23 +157,28 @@ For instance, these two exmaples work properly:
 ```
 and 
 
-```clojure
-(eval-prog '(
-            (let ((if (lambda(x y z) "oops")))
-              (let ((g false))
-                (if g g false)))
-            ))
-;;=> false
-```
-### A little REPL
+```clojure (eval-prog '( (let ((if (lambda(x y z) "oops"))) (let ((g
+false)) (if g g false))) )) ;;=> false ``` ### ClojureScript Support
+scheje is written using reader conditionals. the interpreter namespace
+can be used in a clojurescript project right away.
+
+### A little REPL 
 Now a **REPL** namespace is shipped, exposing a little REPL permitting
-to evaluating expressions and loading files. If you want to play with
-it, just clone the repo and launch:
+to evaluating expressions and loading files. 
+If you want to run it in Clojure/JVM, just clone the repo and launch
 ```shell
 lein run
 ```
-
-
+You can also build a ClojureScript/JS REPL and enjoy it simply
+running:
+```shell
+#install npm dependencies
+npm install readline-sync
+# the build the node app
+lein cljsbuild once
+# and enjoy scheje.js :)
+node target/repl_out/scheje_repl.js
+```
 ## License
 Copyright © 2016 Rafik Naccache
 Distributed under the terms of the The MIT License.
