@@ -139,10 +139,10 @@ Inspired by
 [KFFD](http://web.cs.ucdavis.edu/~devanbu/teaching/260/kohlbecker.pdf)
 Algorithm. Now Scheje appends a timestamp with respect to the
 iteration in which every form is being expanded, thus preventing from
-inadvertendly capturing symbols across expansion.
-If some symbols with timestamps could not be evaluated, Scheje tries to
-evaluate their "root" form, i.e, looks if their original name isn't
-bound in the environment. This kind of forces capture of such symbols,
+inadvertently capturing symbols across different expansion stages.
+If some symbols having timestamps could not be evaluated, Scheje tries to
+evaluate their "root" form, i.e, looks if their name stripped out of the timestamps isn't
+bound in the execution environment. This 'sort of' forces capture of such symbols,
 as to see if they were intended to be passed as globals, for instance.
 
 For instance, these two exmaples work properly:
@@ -160,17 +160,19 @@ and
 ```clojure (eval-prog '( (let ((if (lambda(x y z) "oops"))) (let ((g
 false)) (if g g false))) )) ;;=> false ``` ### ClojureScript Support
 scheje is written using reader conditionals. the interpreter namespace
-can be used in a clojurescript project right away.
+can be used in a clojurescript project right away, in the browser, 
+or in node.js if you want to use the file loading facilities.
 
 ### A little REPL 
 Now a **REPL** namespace is shipped, exposing a little REPL permitting
 to evaluating expressions and loading files. 
+
 If you want to run it in Clojure/JVM, just clone the repo and launch
 ```shell
 lein run
 ```
-You can also build a ClojureScript/JS REPL and enjoy it simply
-running:
+You can also build a ClojureScript/Node.js REPL and enjoy the ultra fast startup compared to JVM's version. Simply
+proceed like so:
 ```shell
 #install npm dependencies
 npm install readline-sync
@@ -179,6 +181,8 @@ lein cljsbuild once
 # and enjoy scheje.js :)
 node target/repl_out/scheje_repl.js
 ```
+## Credits
+scheje's Node.js REPL uses [readLineSync](https://github.com/anseki/readline-sync) from @anseki, which is licensed under the MIT License. 
 ## License
 Copyright © 2016 Rafik Naccache
 Distributed under the terms of the The MIT License.
