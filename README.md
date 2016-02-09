@@ -174,7 +174,7 @@ running:
 ```shell
 #install npm dependencies
 npm install readline-sync
-# the build the node app
+# then build the node app
 lein cljsbuild once
 # and enjoy scheje.js :)
 node target/repl_out/scheje_repl.js
