@@ -1,4 +1,9 @@
 # Change Log
+
+##[0.2.8] - [2016-02-10]
+###Fixed
+- Changed env update when we eval a program. now we use swap!/merge (we used to erroneously do reset!)
+
 ##[0.2.7] - [2016-02-10]
 ###Fixed
 - Fixed a bug in program evaluations which was not recording their

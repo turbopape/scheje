@@ -14,7 +14,7 @@
            (def rl (js/require "readline-sync"))
            (defn js-prompt
              []
-             (.question rl "" ))))
+             (.question rl ""))))
 
 (defn -main 
   "a Little REPL for Scheje"
@@ -38,7 +38,7 @@
                                     last-eval (->> file-eval  :evals (map  #(get % 1)) last)]
                                 (if (nil? (:error last-eval))
                                   (do
-                                    (reset! exec-env (:env file-eval))
+                                    (swap! exec-env merge (:env file-eval))
                                     (println ";; Successfully loaded: " (second input-commands) "with result: " last-eval ))
                                   (println ";Error: " (:error last-eval)" in Loading file " (second input-commands) )))
               :else
@@ -47,7 +47,7 @@
                                                                            :cljs cljs-reader/read-string) input) )]
                   (if (nil? (:error the-eval))
                     (do
-                      (reset! exec-env new-env)
+                      (swap! exec-env merge new-env)
                       (println ";=> " the-eval))
                     (println ";Error: " (:error the-eval))))))
             (catch  #?(:clj Exception :cljs js/Error) e (println ";Error: " (str e))))
