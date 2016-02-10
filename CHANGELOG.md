@@ -1,5 +1,9 @@
 # Change Log
 
+##[0.2.9] - [2016-02-10]
+###Fixed
+- Fixed eval-prog to properly work with the changes introduced in 0.2.7
+
 ##[0.2.8] - [2016-02-10]
 ###Fixed
 - Changed env update when we eval a program. now we use swap!/merge (we used to erroneously do reset!)

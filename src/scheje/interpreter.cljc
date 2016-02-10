@@ -196,4 +196,4 @@
       {:env env
        :evals eval-result})))
 
-(def eval-prog (comp last vals :evals (partial eval-prog-with-env! root-env)))
+(def eval-prog (comp last (partial map #(get % 1)) :evals (partial eval-prog-with-env! root-env)))
