@@ -16,7 +16,6 @@
              []
              (.question rl "" ))))
 
-
 (defn -main 
   "a Little REPL for Scheje"
   [& args]
@@ -35,9 +34,8 @@
             (cond
               (= ",r" switch) (do  (reset! exec-env root-env) (println "Reloaded Base Environment!")) 
               (= ",l" switch) (let [scm-prog (tools/load-prog-from-file (second input-commands))
-                                    _ (println scm-prog)
                                     file-eval (eval-prog-with-env! @exec-env scm-prog)
-                                    last-eval (-> file-eval  :evals vals last)]
+                                    last-eval (->> file-eval  :evals (map  #(get % 1)) last)]
                                 (if (nil? (:error last-eval))
                                   (do
                                     (reset! exec-env (:env file-eval))
@@ -60,6 +58,5 @@
                       :cljs (str input  (js-prompt))))))
         #?(:clj (System/exit 0)
            :cljs (.exit js/process) )))))
-  
 
 #?(:cljs (set! *main-cli-fn* -main))

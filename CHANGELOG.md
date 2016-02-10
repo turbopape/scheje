@@ -1,5 +1,10 @@
 # Change Log
-##[0.2.5] - [2016-02-09]
+##[0.2.7] - [2016-02-10]
+###Fixed
+- Fixed a bug in program evaluations which was not recording their
+  order properly.
+
+##[0.2.6] - [2016-02-09]
 ###Added
 - ClojureScript support using reader conditionals
 - a REPL based on node.js
