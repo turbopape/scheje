@@ -22,7 +22,7 @@
   (println "Scheje" scheje-version "REPL by @turbopape. May The force be With you!!\n"
            ",q (or CTRL-C) to exit. ,l <file> to load a file. ,r to reload root environmnent")
   
-  (loop [input #?(:clj  (read-line)
+  (loop [input #?(:clj  (tools/rm-comments (read-line))
                   :cljs  (js-prompt) )]
     (let [input-commands #?(:clj (clojure.string/split input #"\s")
                             :cljs (js->clj (.match input (js/RegExp. "\\S+" "g"))))
@@ -52,10 +52,10 @@
                     (println ";Error: " (:error the-eval))))))
             (catch  #?(:clj Exception :cljs js/Error) e (println ";Error: " (str e))))
           (recur (if is-complete-sexp?
-                   #?(:clj  (read-line)
-                      :cljs  (js-prompt)  )
-                   #?(:clj (str input (read-line))
-                      :cljs (str input  (js-prompt))))))
+                   #?(:clj  (tools/rm-comments  (read-line))
+                      :cljs  (tools/rm-comments (js-prompt))  )
+                   #?(:clj (str input (tools/rm-comments  (read-line)))
+                      :cljs (str input (tools/rm-comments  (js-prompt)))))))
         #?(:clj (System/exit 0)
            :cljs (.exit js/process) )))))
 

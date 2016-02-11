@@ -1,5 +1,9 @@
 # Change Log
-##[0.2.9] - [2016-02-10]
+##[0.2.11] - [2016-02-10]
+###Fixed
+- Fixed Scheje REPLs comments processing.
+
+##[0.2.10] - [2016-02-10]
 ###Fixed
 - Fixed Scheje version shown in the REPLs' invite.
 

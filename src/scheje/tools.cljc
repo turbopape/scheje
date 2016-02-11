@@ -46,9 +46,18 @@
 
  (every? is-valid-symbol? (get-symbols exp)))
 
+(defn rm-comments
+  [s]
+  #?(:clj (-> s
+              (clojure.string/replace  #";.*\n+" "")
+              (clojure.string/replace  #";.*$" ""))
+     :cljs (-> s
+               (.replace  (js/RegExp. ";.*\n+" "g") "")
+               (.replace  (js/RegExp. ";.*$" "g" ) ""))))
+
 (defn get-sexps
   [s]
-  (loop [remaining s
+  (loop [remaining (rm-comments s)
          level 0
          result []
          current-sexp ""]
