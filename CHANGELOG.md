@@ -1,4 +1,7 @@
 # Change Log
+##[0.2.9] - [2016-02-10]
+###Fixed
+- Fixed Scheje version shown in the REPLs' invite.
 
 ##[0.2.9] - [2016-02-10]
 ###Fixed

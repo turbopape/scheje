@@ -152,7 +152,7 @@
                                   :else (form-apply (cons (first exp) (evlis (rest exp) a)) a)))
     :else (form-apply (cons (first exp) (evlis (rest exp) a)) a)))
 
-(defn eval-exp-with-env!
+(defn eval-exp-with-env
   [env exp]
   (if (tools/is-exp-valid? exp) (try
                                   (cond
@@ -180,14 +180,14 @@
                                   (catch #?(:clj Exception :cljs js/Error) e [env {:error (str "in " exp " : " e)}]))
       [env {:error (str "Invalid Symbols in exp: " exp)}]))
 
-(defn eval-prog-with-env!
+(defn eval-prog-with-env
   [a exprs]  
   (loop [remaining exprs
          eval-result []
          env a]
     (if (seq remaining)
       (let [exp (first remaining)
-            [new-env the-eval]  (eval-exp-with-env! env exp)]
+            [new-env the-eval]  (eval-exp-with-env env exp)]
         (if (nil? (:error the-eval))
           (recur (rest remaining)
                  (conj eval-result [exp the-eval])
@@ -196,4 +196,4 @@
       {:env env
        :evals eval-result})))
 
-(def eval-prog (comp last (partial map #(get % 1)) :evals (partial eval-prog-with-env! root-env)))
+(def eval-prog (comp last (partial map #(get % 1)) :evals (partial eval-prog-with-env root-env)))

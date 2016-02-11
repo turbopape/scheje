@@ -1,6 +1,6 @@
 (ns  scheje.repl
-  (:require [scheje.interpreter :refer [eval-prog-with-env! eval-exp-with-env!]]
-            [scheje.library :refer [root-env]]
+  (:require [scheje.interpreter :refer [eval-prog-with-env eval-exp-with-env]]
+            [scheje.library :refer [root-env scheje-version]]
             [scheje.tools :as tools]
             #?(:cljs [cljs.nodejs :as nodejs])
             #?(:cljs [cljs.reader :as cljs-reader]))
@@ -19,7 +19,7 @@
 (defn -main 
   "a Little REPL for Scheje"
   [& args]
-  (println "Scheje 0.2.5 REPL by @turbopape. May The force be With you!!\n"
+  (println "Scheje" scheje-version "REPL by @turbopape. May The force be With you!!\n"
            ",q (or CTRL-C) to exit. ,l <file> to load a file. ,r to reload root environmnent")
   
   (loop [input #?(:clj  (read-line)
@@ -34,7 +34,7 @@
             (cond
               (= ",r" switch) (do  (reset! exec-env root-env) (println "Reloaded Base Environment!")) 
               (= ",l" switch) (let [scm-prog (tools/load-prog-from-file (second input-commands))
-                                    file-eval (eval-prog-with-env! @exec-env scm-prog)
+                                    file-eval (eval-prog-with-env @exec-env scm-prog)
                                     last-eval (->> file-eval  :evals (map  #(get % 1)) last)]
                                 (if (nil? (:error last-eval))
                                   (do
@@ -43,7 +43,7 @@
                                   (println ";Error: " (:error last-eval)" in Loading file " (second input-commands) )))
               :else
               (when is-complete-sexp?
-                (let [[new-env the-eval] (eval-exp-with-env! @exec-env (#?(:clj clojure.tools.reader/read-string
+                (let [[new-env the-eval] (eval-exp-with-env @exec-env (#?(:clj clojure.tools.reader/read-string
                                                                            :cljs cljs-reader/read-string) input) )]
                   (if (nil? (:error the-eval))
                     (do

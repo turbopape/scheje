@@ -26,6 +26,7 @@ This implementation greatly improves the latest version, which used to
 use Clojure macros. Using lists evaluation, it is possible to use
 scheje as a library on top of ClojureScript as well.
 ## Usage
+You can play with scheje on-line with the [Web REPL](http://turbopape.github.io/scheje/).
 
 The main interpretation function is *form-eval* in the *interpreter*
 name-space.
