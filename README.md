@@ -158,8 +158,15 @@ For instance, these two exmaples work properly:
 ```
 and 
 
-```clojure (eval-prog '( (let ((if (lambda(x y z) "oops"))) (let ((g
-false)) (if g g false))) )) ;;=> false ``` ### ClojureScript Support
+```clojure 
+(eval-prog '( 
+(let ((if (lambda(x y z) "oops")))
+ (let ((g
+false)) (if g g false))) ))
+ ;;=> false 
+``` 
+
+### ClojureScript Support
 scheje is written using reader conditionals. the interpreter namespace
 can be used in a clojurescript project right away, in the browser, 
 or in node.js if you want to use the file loading facilities.
