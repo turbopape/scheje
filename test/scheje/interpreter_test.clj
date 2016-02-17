@@ -126,8 +126,8 @@
 
 (deftest variadic-lambda-1
   (testing "variadic lambda with args as symbol works?"
-    (is (= '(1 2 3 4) (eval-prog '(let ((list2 (lambda x x))
-                                        (list2 1 2 3 4))))))))
+    (is (= '(1 2 3 4) (eval-prog '((let ((list2 (lambda x x)))
+                                         (list2 1 2 3 4))))))))
 
 
 (deftest variadic-lambda-2
