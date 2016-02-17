@@ -1,4 +1,12 @@
 # Change Log
+##[0.2.12] - [2016-02-17]
+###Added
+- Added variadic lambda in name and dotted form.
+- Added define (proc args)... procedure declaration form.
+###Fixed
+- Now you can cons into non seq elements, though there is still no
+  proper/improper list distinction in scheje.
+
 ##[0.2.11] - [2016-02-10]
 ###Fixed
 - Fixed Scheje REPLs comments processing.

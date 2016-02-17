@@ -122,3 +122,25 @@
                                (cond 
                                  ((= x 0) 1 )
                                  (else (* x  (f (- x 1))))))))))))
+
+
+(deftest variadic-lambda-1
+  (testing "variadic lambda with args as symbol works?"
+    (is (= '(1 2 3 4) (eval-prog '(let ((list2 (lambda x x))
+                                        (list2 1 2 3 4))))))))
+
+
+(deftest variadic-lambda-2
+  (testing "variadic lambda with dot works?"
+    (is (= '(1 2 3 4) (eval-prog '(
+                                   (let ((a (lambda (x . y) (cons x y))))
+                                     (a 1 2 3 4))))))))
+  
+
+
+(deftest define-proc
+  (testing "define (a args) body"
+    (is (= 4) (eval-prog '(
+                           (define (a x y) (+ x y))
+                           (a 3 1)
+                           )))))

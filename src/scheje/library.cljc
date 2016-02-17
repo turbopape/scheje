@@ -1,14 +1,15 @@
 (ns scheje.library)
 
-(def scheje-version "0.2.11")
+(def scheje-version "0.2.12")
 
 (def
   root-env
   {
    'true true
+   'list '(lambda x x)
    'false false
    'else true
-   :keywords ['= 'cond 'lambda 'if 'else 'display 'cons 'car 'cdr 'null? 'atom? '+ '- 'eq? '< '<= '> '>= '/ '* 'false 'true 'else]
+   :keywords ['= 'list 'cond 'lambda 'if 'else 'display 'cons 'car 'cdr 'null? 'atom? '+ '- 'eq? '< '<= '> '>= '/ '* 'false 'true 'else]
    :syntax ['{:name let, :literals (),
               :rules (((let () body ... ) ((lambda() body ...)))
                       ((let ((var expr) ...) body ...) ((lambda (var ...) body ...) expr ...))

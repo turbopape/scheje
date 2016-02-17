@@ -20,7 +20,9 @@
                                                   (= f 'null?) (=  '(()) r)                                          
                                                   (= f 'car) (-> r first first)
                                                   (= f 'cdr) (-> r first rest )
-                                                  (= f 'cons) (cons (first r) (second r))
+                                                  (= f 'cons) (cond
+                                                                (seq? (second r)) (cons (first r) (second r)) 
+                                                                :else (cons (first r) (list  (second r))))
                                                   (= f 'atom?) (tools/atom? (first r))
                                                   (= f 'display) (apply println (into [] r))
                                                   (= f '+) (apply + (into [] r))
@@ -32,7 +34,23 @@
                                                   (= f '<=) (apply <= (into [] r))
                                                   (= f '>=) (apply >= (into [] r))
                                                   :else (form-apply (cons  (form-eval f a) r) a))
-         [([(['lambda parms body]:seq) & args ]:seq)] (form-eval body (tools/pairlis parms args a))))
+
+         [([(['lambda parms body]:seq) & args ]:seq)](cond
+                                                  (symbol? parms) (form-eval body
+                                                                             (assoc a  parms args))
+                                                  
+                                                  (some #{'.}  (map (comp
+                                                                     symbol
+                                                                     :sym
+                                                                     unifier/get-symbol-idx name) parms)) (let
+                                                                                                              [nparms (-> parms butlast butlast)
+                                                                                                               rparm (last parms)]
+                                                                                                            (form-eval body (->
+                                                                                                                             (tools/pairlis
+                                                                                                                              nparms
+                                                                                                                              (take (count nparms) args) a)
+                                                                                                                             (assoc rparm (drop (count nparms) args )))))
+                                                  :else (form-eval body (tools/pairlis parms args a)))))
 
 (defn evcon
   [conds a]
@@ -67,7 +85,6 @@
     (if (not (nil? exists?))
       (define a sym binding)
       (throw ( #?(:clj Exception. :cljs js/Error. ) (str "set! can't find symbol: " sym ))))))
-
 
 (defn form-eval-quasi
   [exp a]
@@ -171,10 +188,18 @@
                                     
                                     
                                     (and (seq? exp)
-                                         (= (first exp) 'define)) [(define env
-                                                                     (second exp)
-                                                                     (-> exp rest rest first))
-                                                                   (second exp)]
+                                         (= (first exp) 'define))(cond
+                                                                   (seq? (second exp)) [(define env
+                                                                                          (-> exp second first)
+                                                                                          (list 'lambda
+                                                                                                (-> exp second rest)
+                                                                                                ( -> exp rest rest first)))
+                                                                                        (second exp)]
+
+                                                                   :else [(define env
+                                                                            (second exp)
+                                                                            (-> exp rest rest first))
+                                                                          (second exp)])
                                     
                                     :else [env (form-eval exp env)])
                                   (catch #?(:clj Exception :cljs js/Error) e [env {:error (str "in " exp " : " e)}]))
@@ -197,3 +222,4 @@
        :evals eval-result})))
 
 (def eval-prog (comp last (partial map #(get % 1)) :evals (partial eval-prog-with-env root-env)))
+

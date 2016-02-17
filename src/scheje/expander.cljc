@@ -75,6 +75,5 @@
        (let [bdng (get a-match x)]
          (if (not (nil? bdng))
            bdng
-           x
-           )))
+           x)))
      expanded)))
