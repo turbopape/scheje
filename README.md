@@ -189,6 +189,12 @@ lein cljsbuild once
 # and enjoy scheje.js :)
 node target/repl_out/scheje_repl.js
 ```
+## TODOS - Wanna Contribute?
+Here are some ideas you can help me with:
+- Implement improper/circular lists (dotted pairs, etc...)
+- Implement tail call elimination (maybe evaling the functions to functions and not calling them directly, hence benefitting from Clojure trampolining?"
+- Can we ever dream of implementing Continuations?
+
 ## Credits
 scheje's Node.js REPL uses [readLineSync](https://github.com/anseki/readline-sync) from @anseki, which is licensed under the MIT License. 
 ## License
