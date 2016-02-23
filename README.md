@@ -191,9 +191,12 @@ node target/repl_out/scheje_repl.js
 ```
 ## TODOS - Wanna Contribute?
 Here are some ideas you can help me with:
+- implement proper scheme reader macros : #t, #f,...
+- implement all scheme data structures : vector, associations, ... + related functions.
 - Implement improper/circular lists (dotted pairs, etc...)
-- Implement tail call elimination (maybe evaling the functions to functions and not calling them directly, hence benefitting from Clojure trampolining?"
+- Implement tail call elimination (maybe evaling the functions to functions and not calling them directly, hence benefitting from Clojure trampolining?")
 - Can we ever dream of implementing Continuations?
+If you are interesting in any of these and want more explanation about the code, etc, just fire an issue and I'll more than happily assist :).
 
 ## Credits
 scheje's Node.js REPL uses [readLineSync](https://github.com/anseki/readline-sync) from @anseki, which is licensed under the MIT License. 
