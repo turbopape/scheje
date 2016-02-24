@@ -13,7 +13,8 @@ Now using the magnificent eval/apply dance (as in page 13 of the
 Lisp 1.5 Manual), *scheje* is a tiny scheme implementation on Top of
 Clojure.
 
-Now *scheje* properly implements *define-syntax*, ellipsis is properly
+
+*scheje* properly implements *define-syntax*, ellipsis is properly
 expanded into relevant symbols, which can be respectively used in the
 generated *syntax-rules* templates. In fact, even *let* is implemented in
 terms of *define-syntax*.
@@ -25,6 +26,7 @@ interpret these along with other evaluations will be discussed later.
 This implementation greatly improves the latest version, which used to
 use Clojure macros. Using lists evaluation, it is possible to use
 scheje as a library on top of ClojureScript as well.
+
 ## Usage
 You can play with scheje on-line with the [Web REPL](http://turbopape.github.io/scheje/).
 
@@ -37,11 +39,9 @@ You give it a form and an environment, and you get your evaluation:
 ;;=> 3
 ```
 
-But there is a more advanced function *eval-prog*, that evaluates a
-whole program. This function is bootstrapped with a starting
-environment (implementing some basic symbol definitions and the *let*
-form defined with *define-syntax*). It also does what it takes to only
-show the latest form evaluation in its input program.
+The function *eval-prog*, evaluates a whole program. This function is 
+bootstrapped with a starting
+environment, called the library (see [library.cljc](https://github.com/turbopape/scheje/blob/master/src/scheje/library.cljc) for the contents of the library). When launched, eval-prog evaluates all the forms, only showing the value of the last one.
 
 Here are some examples:
 
@@ -189,10 +189,13 @@ lein cljsbuild once
 # and enjoy scheje.js :)
 node target/repl_out/scheje_repl.js
 ```
+## Features
+Please refer to the [Changelog](https://github.com/turbopape/scheje/blob/master/CHANGELOG.md) and the [interpreter_test.clj test file](https://github.com/turbopape/scheje/blob/master/test/scheje/interpreter_test.clj) to get a comprehensive list of the features and usage of *scheje*.
+
 ## TODOS - Wanna Contribute?
 Here are some ideas you can help me with:
 - implement proper scheme reader macros : #t, #f,...
-- implement all scheme data structures : vector, associations, ... + related functions.
+- implement all scheme data structures : vector ... + related functions.[EDIT: alist (through assoc and alist-cons) is supported as of v0.2.13]
 - Implement improper/circular lists (dotted pairs, etc...)
 - Implement tail call elimination (maybe evaling the functions to functions and not calling them directly, hence benefitting from Clojure trampolining?")
 - Can we ever dream of implementing Continuations?
