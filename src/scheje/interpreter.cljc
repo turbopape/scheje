@@ -15,14 +15,14 @@
   (match [exp]
          ;; The Core Functions 
          [([(f :guard tools/atom?) & r] :seq )] (cond
+                                                  (= f 'length) (count (first  r))
                                                   (= f 'eq?)(apply = (into [] r))
+                                                  (= f 'pair?) (seq? (first r))
                                                   (= f '=) (apply = (into [] r))
                                                   (= f 'null?) (=  '(()) r)                                          
                                                   (= f 'car) (-> r first first)
                                                   (= f 'cdr) (-> r first rest )
-                                                  (= f 'cons) (cond
-                                                                (seq? (second r)) (cons (first r) (second r)) 
-                                                                :else (cons (first r) (list  (second r))))
+                                                  (= f 'cons) (cons (first r) (second r)) 
                                                   (= f 'atom?) (tools/atom? (first r))
                                                   (= f 'display) (apply println (into [] r))
                                                   (= f '+) (apply + (into [] r))
@@ -109,6 +109,7 @@
 (defn form-eval
   [exp a]
   (cond
+    
     (or  (= '() exp) 
          (nil? exp)) '()
 

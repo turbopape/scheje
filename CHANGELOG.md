@@ -1,4 +1,13 @@
 # Change Log
+##[0.2.13] - [2016-02-24]
+###Added
+- Added assoc (assoc 'a '((a 1)(b 2)...)) => '(a 1)
+- Added alist-cons
+- Added length
+- Added cadr, cddr, etc... functions
+###Fixed
+- No such things as improper lists (for now). (cons atom atom) => error
+
 ##[0.2.12] - [2016-02-17]
 ###Added
 - Added variadic lambda in name and dotted form.

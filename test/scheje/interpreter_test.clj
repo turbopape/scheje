@@ -144,3 +144,26 @@
                            (define (a x y) (+ x y))
                            (a 3 1)
                            )))))
+
+
+(deftest assoc-test-1
+  (testing "assoc exists work?"
+    (is (= '(a 1) (eval-prog '(
+                               (assoc 'a '((b 2)(a 1)(c 3)))
+                               ))))))
+
+
+(deftest assoc-test-2
+  (testing "assoc not exists work?"
+    (is (= false (eval-prog '(
+                              (assoc 'e '((b 2)(a 1)(c 3)))
+                              ))))))
+
+(deftest acons-list-test
+  (testing "alist-cons "
+    (is (= '((a 1) (b 3))) (eval-prog '(
+                                        (alist-cons 'a 1 '((b 3)))
+                                        )))
+    ))
+
+
