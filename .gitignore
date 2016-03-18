@@ -1,6 +1,7 @@
 /target
 /classes
 /checkouts
+/node_modules
 pom.xml
 pom.xml.asc
 .cljs*

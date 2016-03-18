@@ -30,6 +30,7 @@
                                                   (= f 'number?) (number? (first r))
                                                   (= f 'vector?) (vector? (first r))
                                                   (= f 'vector) (into [] r)
+                                                  (= f 'vector-ref) (apply get r)
                                                   (= f 'display) (apply println (into [] r))
                                                   (= f '+) (apply + (into [] r))
                                                   (= f '-) (apply - (into [] r))

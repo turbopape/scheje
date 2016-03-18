@@ -1,6 +1,6 @@
 (ns scheje.library)
 
-(def scheje-version "0.2.14")
+(def scheje-version "0.2.15")
 
 (def
   root-env
@@ -44,14 +44,19 @@
    'alist-cons '(lambda (key datum alist)
                         (cons (cons key (list  datum)) alist))
    'true true
+   'vector-ref '(lambda(v i)(vector-ref v i))
    'list '(lambda x x)
    'false false
    'else true
    'vector vector
    'vector? 'vector?
-   :keywords ['vector 'vector? '=> 'not 'pair? 'length 'quote 'unquote 'unquote-splicing 'quasiquote '= 'list 'cond 'lambda 'if 'else 'display 'cons 'car 'cdr 'null? 'atom? '+ '- 'eq? '< '<= '> '>= '/ '* 'false 'true 'else 'caar 'cadr 'cdar  
-'cddr 'caaar 'caadr 'cadar 'caddr 'cdaar 'cdadr 'cddar 'cdddr 
-'caaaar 'caaadr 'caadar 'caaddr 'cadaar 'cadadr 'caddar 'cadddr 'cdaaar 'cdaadr 'cdadar 'cdaddr 'cddaar 'cddadr 'cdddar 'cddddr]
+   :keywords ['vector 'vector? '=> 'not 'pair? 'length 'quote
+              'unquote 'unquote-splicing 'quasiquote '= 'list 'cond 'lambda 'if 'else
+              'display 'cons 'car 'cdr 'null? 'atom? '+ '- 'eq? '< '<= '> '>= '/ '*
+              'false 'true 'else 'caar 'cadr 'cdar  
+              'cddr 'caaar 'caadr 'cadar 'caddr 'cdaar 'cdadr 'cddar 'cdddr 
+              'caaaar 'caaadr 'caadar 'caaddr 'cadaar 'cadadr 'caddar 'cadddr
+              'cdaaar 'cdaadr 'cdadar 'cdaddr 'cddaar 'cddadr 'cdddar 'cddddr]
    
    :syntax ['{:name let, :literals (),
               :rules (((let () body ... ) ((lambda() body ...)))

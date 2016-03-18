@@ -1,4 +1,7 @@
 # Change Log
+##[0.2.15] - [2016-03-18]
+###Added
+- Added vector-ref and 
 ##[0.2.14] - [2016-03-18]
 ###Added
 - Now you can use scheme reader literals, when red from strings, using the
