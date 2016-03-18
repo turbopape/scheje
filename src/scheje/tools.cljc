@@ -88,12 +88,77 @@
       result)))
 
 
+
+(defn sanitize-scm->clj
+  "replace #t, :, /,... into valid clojure strs"
+  [s]
+  #?(:clj (-> s
+              (clojure.string/replace "#t" "true")
+              (clojure.string/replace "#f" "false")
+              (clojure.string/replace "#(" "(vector ")
+              (clojure.string/replace "==" "_dbl_eq_")
+              (clojure.string/replace "/" "_slash_")
+              (clojure.string/replace "#" "_hash_")
+              (clojure.string/replace ":" "_column_")
+              (clojure.string/replace "@" "_at_")
+              (clojure.string/replace #"\^" "_circum_"))
+     :cljs (-> s
+               (.replace "#t" "true" )
+               (.replace "#f" "false")
+               (.replace "==" "_dbl_eq_" )
+               (.replace "/" "_slash_" )
+               (.replace "#(" "(vector ")
+               (.replace "#" "_hash_")
+               (.replace ":" "_column_")
+               (.replace "@" "_at_")
+               (.replace "^" "_circum_"))))
+
+(defn print-clj->scm
+  "replace clojure literals to scheme literals #t, #f, :, @..."
+  [s]
+  #?(:clj (-> s
+              (clojure.string/replace "true" "#t" )
+              (clojure.string/replace "false" "#f")
+              (clojure.string/replace "_dbl_eq_" "==" )
+              (clojure.string/replace "_slash_" "/")
+              (clojure.string/replace "_hash_" "#")
+              (clojure.string/replace "[" "#(")
+              (clojure.string/replace "]" ")")
+              (clojure.string/replace "_column_" ":")
+              (clojure.string/replace "_at_" "@")
+              (clojure.string/replace "_circum_" "^"))
+     :cljs (-> s
+              (.replace "true" "#t" )
+              (.replace "false" "#f")
+              (.replace "_dbl_eq_" "==" )
+              (.replace "_slash_" "/")
+              (.replace "[" "#(")
+              (.replace "]" ")")
+              (.replace "_hash_" "#")
+              (.replace "_column_" ":")
+              (.replace "_at_" "@")
+              (.replace "_circum_" "^"))))
+
+
+(defn format-eval
+  [the-eval]
+  (print-clj->scm
+   (pr-str the-eval)))
+
+
+(defn slurp-scm-str
+  [input]
+  (#?(:clj clojure.tools.reader/read-string
+      :cljs cljs-reader/read-string)
+   (sanitize-scm->clj input)))
+
 (defn load-prog-from-file
   [f]
   (let [file-string #?(:clj (slurp f)
                        :cljs (let [fs (js/require "fs")]
                                (.readFileSync fs f "utf8")))]
     (->>  file-string
-          (get-sexps)
+          sanitize-scm->clj
+          get-sexps
           (map #?(:clj clojure.tools.reader/read-string
                   :cljs cljs-reader/read-string)))))

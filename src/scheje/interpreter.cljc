@@ -19,21 +19,33 @@
                                                   (= f 'eq?)(apply = (into [] r))
                                                   (= f 'pair?) (seq? (first r))
                                                   (= f '=) (apply = (into [] r))
-                                                  (= f 'null?) (=  '(()) r)                                          
+                                                  (= f 'null?) (=  '(()) r)
+                                                  (= f 'zero?) (zero? (first r))
                                                   (= f 'car) (-> r first first)
                                                   (= f 'cdr) (-> r first rest )
                                                   (= f 'cons) (cons (first r) (second r)) 
                                                   (= f 'atom?) (tools/atom? (first r))
+                                                  (= f 'not) (not (first r))
+                                                  (= f 'symbol?) (symbol? (first r))
+                                                  (= f 'number?) (number? (first r))
+                                                  (= f 'vector?) (vector? (first r))
+                                                  (= f 'vector) (into [] r)
                                                   (= f 'display) (apply println (into [] r))
                                                   (= f '+) (apply + (into [] r))
                                                   (= f '-) (apply - (into [] r))
+                                                  (= f '_slash_) (apply / (into [] r))
                                                   (= f '/) (apply / (into [] r))
                                                   (= f '*) (apply * (into [] r))
                                                   (= f '<) (apply < (into [] r))
                                                   (= f '>) (apply > (into [] r))
                                                   (= f '<=) (apply <= (into [] r))
                                                   (= f '>=) (apply >= (into [] r))
-                                                  :else (form-apply (cons  (form-eval f a) r) a))
+                                                  :else (let [f-eval (form-eval f a)]
+                                                           (if (= 'lambda (first f-eval))
+                                                             (form-apply (cons f-eval r) a)
+                                                             (throw (#?(:clj Exception.
+                                                                        :cljs js/Error.) 
+                                                                     (pr-str "Can't apply " f-eval " on " r))))))
 
          [([(['lambda parms body]:seq) & args ]:seq)](cond
                                                   (symbol? parms) (form-eval body
@@ -49,13 +61,16 @@
                                                                                                                              (tools/pairlis
                                                                                                                               nparms
                                                                                                                               (take (count nparms) args) a)
-                                                                                                                             (assoc rparm (drop (count nparms) args )))))
-                                                  :else (form-eval body (tools/pairlis parms args a)))))
+                                                                                                                             (assoc rparm (drop (count nparms) args)))))
+                                                  :else (form-eval body (tools/pairlis parms args a)))
+         :else (form-eval (cons (form-eval (first exp) a) (rest exp)) a)))
 
 (defn evcon
   [conds a]
   (cond
-    (form-eval (-> conds first first) a) (form-eval (-> conds first rest first) a)
+    (form-eval (-> conds first first) a) (cond (and  (tools/atom? (-> conds first rest first)) ;; (a-cond => second-cond)
+                                                     (= '=> (-> conds first rest first))) (-> conds first rest rest first) 
+                                           :else (form-eval (-> conds first rest first) a))
     :else (evcon (rest conds) a)))
 
 (defn evlis
@@ -84,7 +99,8 @@
   (let [exists? (get a sym)]
     (if (not (nil? exists?))
       (define a sym binding)
-      (throw ( #?(:clj Exception. :cljs js/Error. ) (str "set! can't find symbol: " sym ))))))
+      (throw (#?(:clj Exception. :cljs js/Error.)
+              (str "set! can't find symbol: " sym))))))
 
 (defn form-eval-quasi
   [exp a]
@@ -99,10 +115,10 @@
         #?(:clj (rational? exp))) exp
     
     (tools/atom? (first exp)) (cons (first exp) (form-eval-quasi (rest exp) a))
-    (= (-> exp first first) 'unquote)  (cons  (form-eval (-> exp first second ) a)
-                                              (form-eval-quasi (rest exp) a))
+    (= (-> exp first first) 'unquote)  (cons (form-eval (-> exp first second ) a)
+                                             (form-eval-quasi (rest exp) a))
     (= (-> exp first first) 'unquote-splicing) (into (form-eval (-> exp first second ) a)
-                                                     (form-eval-quasi (rest exp) a) )
+                                                     (form-eval-quasi (rest exp) a))
     :else (cons (form-eval-quasi (-> exp first) a)
                 (form-eval-quasi (rest exp ) a))))
 
@@ -126,7 +142,7 @@
                               (if (some #{\#} (name  exp) )
                                 (form-eval  (symbol  (:sym  (unifier/get-symbol-idx (name  exp)))) a) 
                                 ;; maybe a macro symbol that we want captured, a function name?
-                                (throw ( #?(:clj Exception. :cljs js/Error. ) (str  "No binding found for " exp))))))))
+                                (throw ( #?(:clj Exception. :cljs js/Error. ) (pr-str  "No binding found for " exp))))))))
 
     (tools/atom? (first exp)) (let [some-syn (tools/get-syntax (first exp) (:syntax a))]
                                 (cond
@@ -145,14 +161,14 @@
                                                                                                                      [:scopes expanded-tpl]                                                                                                                  (conj root-env  a-match)))) 
                                                                  :else (if (seq remaining)
                                                                          (recur (rest remaining))
-                                                                         (throw ( #?(:clj Exception. :cljs js/Error. ) (str "Error in resolving syntax in: "
+                                                                         (throw ( #?(:clj Exception. :cljs js/Error. ) (pr-str "Error in resolving syntax in: "
                                                                                                                             exp))))))))
                                   
 
                                   
                                   (or #?(:clj (rational? (first exp)))
                                       (string? (first exp))
-                                      (number? (first exp))) (throw ( #?(:clj Exception. :cljs js/Error. ) (str "error: The Scalar: `" (first exp)
+                                      (number? (first exp))) (throw ( #?(:clj Exception. :cljs js/Error. ) (pr-str "error: The Scalar: `" (first exp)
                                                                                                                 "` Cannot be Applied on " (rest exp) "!!")))
                                   (= (first exp) 'lambda) exp
                                   (= (first exp) 'quasiquote) (form-eval-quasi (second exp) a )
@@ -204,7 +220,7 @@
                                     
                                     :else [env (form-eval exp env)])
                                   (catch #?(:clj Exception :cljs js/Error) e [env {:error (str "in " exp " : " e)}]))
-      [env {:error (str "Invalid Symbols in exp: " exp)}]))
+      [env {:error (pr-str "Invalid Symbols in exp: " exp)}]))
 
 (defn eval-prog-with-env
   [a exprs]  

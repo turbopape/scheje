@@ -194,8 +194,10 @@ Please refer to the [Changelog](https://github.com/turbopape/scheje/blob/master/
 
 ## TODOS - Wanna Contribute?
 Here are some ideas you can help me with:
-- implement proper scheme reader macros : #t, #f,...
-- implement all scheme data structures : vector ... + related functions.[EDIT: alist (through assoc and alist-cons) is supported as of v0.2.13]
+- implement proper scheme reader macros : #t, #f,...[Edit: DONE]
+- implement lexical closures.
+- implement all scheme data structures :  ... + related
+  functions.[EDIT: alist (through assoc and alist-cons) is supported as of v0.2.13. Vectors are also supported]
 - Implement improper/circular lists (dotted pairs, etc...)
 - Implement tail call elimination (maybe evaling the functions to functions and not calling them directly, hence benefitting from Clojure trampolining?")
 - Can we ever dream of implementing Continuations?
