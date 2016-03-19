@@ -193,15 +193,7 @@ node target/repl_out/scheje_repl.js
 Please refer to the [Changelog](https://github.com/turbopape/scheje/blob/master/CHANGELOG.md) and the [interpreter_test.clj test file](https://github.com/turbopape/scheje/blob/master/test/scheje/interpreter_test.clj) to get a comprehensive list of the features and usage of *scheje*.
 
 ## TODOS - Wanna Contribute?
-Here are some ideas you can help me with:
-- implement proper scheme reader macros : #t, #f,...[Edit: DONE]
-- implement lexical closures.
-- implement all scheme data structures :  ... + related
-  functions.[EDIT: alist (through assoc and alist-cons) is supported as of v0.2.13. Vectors are also supported]
-- Implement improper/circular lists (dotted pairs, etc...)
-- Implement tail call elimination (maybe evaling the functions to functions and not calling them directly, hence benefitting from Clojure trampolining?")
-- Can we ever dream of implementing Continuations?
-If you are interesting in any of these and want more explanation about the code, etc, just fire an issue and I'll more than happily assist :).
+You can see how you can help by seeing the [open issues](https://github.com/turbopape/scheje/issues)
 
 ## Credits
 scheje's Node.js REPL uses [readLineSync](https://github.com/anseki/readline-sync) from @anseki, which is licensed under the MIT License. 
