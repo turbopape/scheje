@@ -3,7 +3,7 @@
 [![Build Status](https://travis-ci.org/turbopape/scheje.svg?branch=master)](https://travis-ci.org/turbopape/scheje)
 [![Clojars Project](https://img.shields.io/clojars/v/scheje.svg)](https://clojars.org/scheje)
 [![Gratipay Team](https://img.shields.io/gratipay/team/scheje.svg)](https://gratipay.com/scheje/)
-[![Slack Team](https://img.shields.io/badge/chat-%23%20team-yellowgreen.svg)](https://scheje.slack.com/shared_invite/MzA5NjE3Njg3MDgtMTQ1OTQzNzMzOS1hMGY3YjI3Mjlk)
+[![Slack Team](https://img.shields.io/badge/chat-%23%20team-yellowgreen.svg)](https://scheje.slack.com)
  
  >"If you give someone Fortran, he has Fortran. If you give someone Lisp, he has any language he pleases."
  - Guy L. Steele
