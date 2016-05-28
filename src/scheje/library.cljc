@@ -1,6 +1,6 @@
 (ns scheje.library)
 
-(def scheje-version "0.2.15")
+(def scheje-version "0.2.16")
 
 (def
   root-env
