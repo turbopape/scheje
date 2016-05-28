@@ -48,22 +48,23 @@
                                                                         :cljs js/Error.) 
                                                                      (pr-str "Can't apply " f-eval " on " r))))))
 
-         [([(['lambda parms body]:seq) & args ]:seq)](cond
+         [([(['lambda parms body & env]:seq) & args ]:seq)](cond
                                                   (symbol? parms) (form-eval body
-                                                                             (assoc a  parms args))
-                                                  
-                                                  (some #{'.}  (map (comp
+                                                                             (assoc (apply merge (cons a env)) parms args))
+                                                  (some #{'.} (map (comp
                                                                      symbol
                                                                      :sym
                                                                      unifier/get-symbol-idx name) parms)) (let
                                                                                                               [nparms (-> parms butlast butlast)
                                                                                                                rparm (last parms)]
                                                                                                             (form-eval body (->
-                                                                                                                             (tools/pairlis
-                                                                                                                              nparms
-                                                                                                                              (take (count nparms) args) a)
-                                                                                                                             (assoc rparm (drop (count nparms) args)))))
-                                                  :else (form-eval body (tools/pairlis parms args a)))
+                                                                                                                              (tools/pairlis
+                                                                                                                                nparms
+                                                                                                                                (take (count nparms) args) a)
+                                                                                                                              (assoc rparm (drop (count nparms) args))
+                                                                                                                              (merge (apply merge env))
+                                                                                                                              )))
+                                                  :else (form-eval body (tools/pairlis parms args (apply merge (cons (let [println env] a) env)))))
          :else (form-eval (cons (form-eval (first exp) a) (rest exp)) a)))
 
 (defn evcon
@@ -164,14 +165,14 @@
                                                                          (recur (rest remaining))
                                                                          (throw ( #?(:clj Exception. :cljs js/Error. ) (pr-str "Error in resolving syntax in: "
                                                                                                                             exp))))))))
-                                  
 
-                                  
+
+
                                   (or #?(:clj (rational? (first exp)))
                                       (string? (first exp))
                                       (number? (first exp))) (throw ( #?(:clj Exception. :cljs js/Error. ) (pr-str "error: The Scalar: `" (first exp)
                                                                                                                 "` Cannot be Applied on " (rest exp) "!!")))
-                                  (= (first exp) 'lambda) exp
+                                  (= (first exp) 'lambda) (concat exp [a])
                                   (= (first exp) 'quasiquote) (form-eval-quasi (second exp) a )
                                   (= (first exp) 'unquote) (throw ( #?(:clj Exception. :cljs js/Error. )
                                                                    (str "error: unquote can only be called "
@@ -211,7 +212,7 @@
                                                                                           (-> exp second first)
                                                                                           (list 'lambda
                                                                                                 (-> exp second rest)
-                                                                                                ( -> exp rest rest first)))
+                                                                                                (-> exp rest rest first)))
                                                                                         (second exp)]
 
                                                                    :else [(define env
@@ -241,3 +242,12 @@
 
 (def eval-prog (comp last (partial map #(get % 1)) :evals (partial eval-prog-with-env root-env)))
 
+(eval-prog '((let ((b 100)) (lambda (x) (cons b x))) 1 2))
+
+(eval-prog '(
+             (let ((a (lambda (x . y) (cons x y))))
+               (a 1 2 3 4))))
+
+(eval-prog '((let () (lambda x x)) 1 2 3 4))
+
+; (eval-prog '((let ((a (lambda x x))) (a 1 2 3 4))))
