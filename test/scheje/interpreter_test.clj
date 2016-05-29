@@ -126,8 +126,7 @@
 
 (deftest variadic-lambda-1
   (testing "variadic lambda with args as symbol works?"
-    (is (= '(1 2 3 4) (eval-prog '((let ((list2 (lambda x x)))
-                                         (list2 1 2 3 4))))))))
+    (is (= '(1 2 3 4) (eval-prog '((let ((list2 (lambda x x))) (list2 1 2 3 4))))))))
 
 
 (deftest variadic-lambda-2
@@ -135,8 +134,12 @@
     (is (= '(1 2 3 4) (eval-prog '(
                                    (let ((a (lambda (x . y) (cons x y))))
                                      (a 1 2 3 4))))))))
-  
 
+(deftest variadic-lambda-2
+  (testing "variadic lambda with dot works?"
+    (is (= '(1 2 3 4) (eval-prog '(
+                                   (let ((a (lambda (x . y) (cons x y))))
+                                     (a 1 2 3 4))))))))
 
 (deftest define-proc
   (testing "define (a args) body"
@@ -166,4 +169,15 @@
                                         )))
     ))
 
+(deftest closure-test-1
+  (testing "let based closure work ?"
+    (is (= 5 (eval-prog '(((let ((a 1)) (lambda (x) (+ x a))) 4)))))))
 
+(deftest closure-test-2
+  (testing "variadic closure with dot works ?"
+    (is (= '(2 2 3 4) (eval-prog '(
+                                   ((let ((b 1)) (lambda (x . y) (cons (+ b x) y))) 1 2 3 4) ))))))
+
+(deftest closure-test-3
+  (testing "variadic closure with args as symbol works?"
+    (is (= '(100 1 2 3 4) (eval-prog '(((let ((b 100))(lambda x (cons b x))) 1 2 3 4)))))))
