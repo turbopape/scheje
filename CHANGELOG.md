@@ -1,4 +1,8 @@
 # Change Log
+##[0.2.16]  - [2016-05-29]
+###Added
+- Added support for lexical closures
+
 ##[0.2.15] - [2016-03-18]
 ###Added
 - vector-ref to get the element of a vector at index.
