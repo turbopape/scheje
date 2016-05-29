@@ -181,3 +181,9 @@
 (deftest closure-test-3
   (testing "variadic closure with args as symbol works?"
     (is (= '(100 1 2 3 4) (eval-prog '(((let ((b 100))(lambda x (cons b x))) 1 2 3 4)))))))
+
+(deftest closure-test-4
+  (testing "closure defined using 'define' works ?"
+    (is (= 3 (eval-prog
+               '((define add (lambda (c) (lambda (x) (+ x 1))))
+                 ((add 1) 2)))))))

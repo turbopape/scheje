@@ -1,6 +1,7 @@
 # Change Log
 ##[0.2.6]  - [2016-05-29]
-###Added support for lexical closures
+###Added
+- Added support for lexical closures
 
 ##[0.2.15] - [2016-03-18]
 ###Added
