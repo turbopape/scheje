@@ -78,6 +78,7 @@
             '{:name and, :literals (),
               :rules (((and x) x) ((and) true)
                       ((and x y ...) (if x (and y ...) false)))}
+            
             '{:name or, :literals (),
               :rules (((or) true)
                       ((or x) x)

@@ -7,8 +7,7 @@
   #?(:clj (:gen-class)))
 
 (def exec-env (atom root-env))
-                                        ;(def current-sexp (atom ""))
-
+                            
 #?(:cljs (do
            (nodejs/enable-util-print!)
            (def rl (js/require "readline-sync"))

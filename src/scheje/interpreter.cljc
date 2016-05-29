@@ -241,13 +241,3 @@
        :evals eval-result})))
 
 (def eval-prog (comp last (partial map #(get % 1)) :evals (partial eval-prog-with-env root-env)))
-
-(eval-prog '((let ((b 100)) (lambda (x) (cons b x))) 1 2))
-
-(eval-prog '(
-             (let ((a (lambda (x . y) (cons x y))))
-               (a 1 2 3 4))))
-
-(eval-prog '((let () (lambda x x)) 1 2 3 4))
-
-; (eval-prog '((let ((a (lambda x x))) (a 1 2 3 4))))

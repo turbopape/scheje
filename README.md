@@ -8,7 +8,7 @@
  >"If you give someone Fortran, he has Fortran. If you give someone Lisp, he has any language he pleases."
  - Guy L. Steele
  
-Now using the magnificent eval/apply dance (as in page 13 of the
+Using the magnificent eval/apply dance (as in page 13 of the
 Lisp 1.5 Manual), *scheje* is a tiny scheme implementation on Top of
 Clojure.
 
@@ -18,13 +18,9 @@ expanded into relevant symbols, which can be respectively used in the
 generated *syntax-rules* templates. In fact, even *let* is implemented in
 terms of *define-syntax*.
 
-the two defining forms, *define* and *define-syntax* generate new
+The two defining forms, *define* and *define-syntax* generate new
 environments as per the bindings they introduce. Helper functions that
 interpret these along with other evaluations will be discussed later.
-
-This implementation greatly improves the latest version, which used to
-use Clojure macros. Using lists evaluation, it is possible to use
-scheje as a library on top of ClojureScript as well.
 
 ## Usage
 You can play with scheje on-line with the [Web REPL](http://turbopape.github.io/scheje/).
@@ -151,18 +147,17 @@ For instance, these two exmaples work properly:
              (define-syntax or2
                (syntax-rules ()
                              ((or2 e1 e2) (let ((t e1)) (if t t e2) ))))
-             (let ((t true)) (or2 false t ))
-             ))
+             (let ((t true)) (or2 false t ))))
 ;;=> true
 ```
 and 
 
 ```clojure 
 (eval-prog '( 
-(let ((if (lambda(x y z) "oops")))
- (let ((g
-false)) (if g g false))) ))
- ;;=> false 
+             (let ((if (lambda(x y z) "oops")))
+              (let ((g false)) 
+                    (if g g false)))))
+;;=> false 
 ``` 
 
 ### ClojureScript Support
