@@ -19,7 +19,7 @@
 (defn -main 
   "a Little REPL for Scheje"
   [& args]
-  (println "Scheje" scheje-version "REPL by @turbopape. May The force be With you!!\n"
+  (println "Scheje" scheje-version "REPL by @turbopape and Contributors. May The force be With you!!\n"
            ",q (or CTRL-C) to exit. ,l <file> to load a file. ,r to reload root environmnent")
   
   (loop [input #?(:clj  (tools/rm-comments (read-line))

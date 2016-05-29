@@ -191,11 +191,15 @@ node target/repl_out/scheje_repl.js
 ## Features
 Please refer to the [Changelog](https://github.com/turbopape/scheje/blob/master/CHANGELOG.md) and the [interpreter_test.clj test file](https://github.com/turbopape/scheje/blob/master/test/scheje/interpreter_test.clj) to get a comprehensive list of the features and usage of *scheje*.
 
+## Contributors
+Thanks to these wonderful people who helped the development of Scheje:
+- [Balaji Rao](https://github.com/balajirrao) 
+
 ## TODOS - Wanna Contribute?
 You can see how you can help by seeing the [open issues](https://github.com/turbopape/scheje/issues)
 
 ## Credits
 scheje's Node.js REPL uses [readLineSync](https://github.com/anseki/readline-sync) from @anseki, which is licensed under the MIT License. 
 ## License
-Copyright © 2016 Rafik Naccache
+Copyright © 2016 Rafik Naccache and Contributors.
 Distributed under the terms of the The MIT License.
