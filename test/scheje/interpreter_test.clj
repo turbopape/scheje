@@ -185,5 +185,5 @@
 (deftest closure-test-4
   (testing "closure defined using 'define' works ?"
     (is (= 3 (eval-prog
-               '((define add (lambda (c) (lambda (x) (+ x 1))))
+               '((define add (lambda (c) (lambda (x) (+ x c))))
                  ((add 1) 2)))))))
