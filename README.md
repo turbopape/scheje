@@ -26,7 +26,7 @@ interpret these along with other evaluations will be discussed later.
 You can play with scheje on-line with the [Web REPL](http://turbopape.github.io/scheje/).
 
 The main interpretation function is *form-eval* in the *interpreter*
-name-space.
+namespace.
 
 You give it a form and an environment, and you get your evaluation:
 ```clojure
