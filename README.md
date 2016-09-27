@@ -189,6 +189,7 @@ Please refer to the [Changelog](https://github.com/turbopape/scheje/blob/master/
 ## Contributors
 Thanks to these wonderful people who helped the development of Scheje:
 - [Balaji Rao](https://github.com/balajirrao)
+
 And to these awesome proof-readers:
 - [jaredestroud](https://github.com/jaredestroud)
 - [yurimalheiros](https://github.com/yurimalheiros)
