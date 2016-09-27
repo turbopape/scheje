@@ -76,7 +76,7 @@ way:
 ;;=> true
 ```
 
-And, last but not least, here is the must-have *append* function, necessary for
+Last but not least, here is the must-have *append* function, necessary for
 every decent scheme implementation!
 ```clojure
 (eval-prog '((define append
