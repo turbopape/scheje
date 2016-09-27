@@ -13,7 +13,7 @@ Lisp 1.5 Manual), *scheje* is a tiny scheme implementation on Top of
 Clojure.
 
 
-*scheje* properly implements *define-syntax*, ellipsis is properly
+*Scheje* properly implements *define-syntax*, ellipsis is properly
 expanded into relevant symbols, which can be respectively used in the
 generated *syntax-rules* templates. In fact, even *let* is implemented in
 terms of *define-syntax*.
@@ -26,7 +26,7 @@ interpret these along with other evaluations will be discussed later.
 You can play with scheje on-line with the [Web REPL](http://turbopape.github.io/scheje/).
 
 The main interpretation function is *form-eval* in the *interpreter*
-name-space.
+namespace.
 
 You give it a form and an environment, and you get your evaluation:
 ```clojure
@@ -76,7 +76,7 @@ way:
 ;;=> true
 ```
 
-And, last but not least, here is the must-have *append* function, necessary for
+Last but not least, here is the must-have *append* function, necessary for
 every decent scheme implementation!
 ```clojure
 (eval-prog '((define append
@@ -161,8 +161,9 @@ and
 ```
 
 ### ClojureScript Support
-scheje is written using reader conditionals. The interpreter namespace
-can be used in a clojurescript project right away, in the browser,
+
+Scheje is written using reader conditionals. the interpreter namespace
+can be used in a clojurescript project right away, in the browser, 
 or in node.js if you want to use the file loading facilities.
 
 ### A little REPL
@@ -194,7 +195,7 @@ Thanks to these wonderful people who helped the development of Scheje:
 You can see how you can help by seeing the [open issues](https://github.com/turbopape/scheje/issues)
 
 ## Credits
-scheje's Node.js REPL uses [readLineSync](https://github.com/anseki/readline-sync) from @anseki, which is licensed under the MIT License.
+Scheje's Node.js REPL uses [readLineSync](https://github.com/anseki/readline-sync) from @anseki, which is licensed under the MIT License. 
 ## License
 Copyright © 2016 Rafik Naccache and Contributors.
 Distributed under the terms of the MIT License.
