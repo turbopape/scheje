@@ -161,7 +161,7 @@ and
 ``` 
 
 ### ClojureScript Support
-scheje is written using reader conditionals. the interpreter namespace
+Scheje is written using reader conditionals. the interpreter namespace
 can be used in a clojurescript project right away, in the browser, 
 or in node.js if you want to use the file loading facilities.
 
@@ -194,7 +194,7 @@ Thanks to these wonderful people who helped the development of Scheje:
 You can see how you can help by seeing the [open issues](https://github.com/turbopape/scheje/issues)
 
 ## Credits
-scheje's Node.js REPL uses [readLineSync](https://github.com/anseki/readline-sync) from @anseki, which is licensed under the MIT License. 
+Scheje's Node.js REPL uses [readLineSync](https://github.com/anseki/readline-sync) from @anseki, which is licensed under the MIT License. 
 ## License
 Copyright © 2016 Rafik Naccache and Contributors.
 Distributed under the terms of the The MIT License.
