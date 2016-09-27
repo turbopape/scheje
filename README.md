@@ -13,7 +13,7 @@ Lisp 1.5 Manual), *scheje* is a tiny scheme implementation on Top of
 Clojure.
 
 
-*scheje* properly implements *define-syntax*, ellipsis is properly
+*Scheje* properly implements *define-syntax*, ellipsis is properly
 expanded into relevant symbols, which can be respectively used in the
 generated *syntax-rules* templates. In fact, even *let* is implemented in
 terms of *define-syntax*.
