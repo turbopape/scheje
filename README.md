@@ -48,7 +48,7 @@ Here are some examples:
               (let ((x 1)(y 2)) (+ x y))))
 ;;=>3
 ```
-This example shows how we did to introduce the let form, though it is
+This example shows what we did to introduce the let form, though it is
 already implemented in the root environment used by scheje, so you
 don't have to define it every time you use *eval-prog*
 
@@ -64,7 +64,7 @@ Analogous to *let*, here's how one can declare *and* using a recursive
 ;;=> false
 ```
 Same here, this is already defined in *root-env* so you don't have to
-define it every time you use *eval-prog*. *or* is defined in a same
+define it every time you use *eval-prog*. *or* is defined in the same
 way:
 ```clojure
 (eval-prog '((define-syntax or
@@ -110,7 +110,7 @@ each *let* introduced expression's symbols are stored in its own
 scope. This avoids name clash:
 
 In the following example, a is defined at the root-env, but "inner" a
-is retruned from the *let* macro:
+is returned from the *let* macro:
 ```clojure
 (eval-prog '((define a "outer")
              (let ((x (and false false))
@@ -134,14 +134,14 @@ If we access a symbol outside the macro, we get its root binding:
 Inspired by
 [KFFD](http://web.cs.ucdavis.edu/~devanbu/teaching/260/kohlbecker.pdf)
 Algorithm. Now Scheje appends a timestamp with respect to the
-iteration in which every form is being expanded, thus preventing from
+iteration in which every form is being expanded, thus preventing it from
 inadvertently capturing symbols across different expansion stages.
-If some symbols having timestamps could not be evaluated, Scheje tries to
-evaluate their "root" form, i.e, looks if their name stripped out of the timestamps isn't
+If some symbols have timestamps that cannot be evaluated, Scheje tries to
+evaluate their "root" form, i.e, checks if their name, stripped out of the timestamps, isn't
 bound in the execution environment. This 'sort of' forces capture of such symbols,
 as to see if they were intended to be passed as globals, for instance.
 
-For instance, these two exmaples work properly:
+For instance, these two examples work properly:
 ```clojure
 (eval-prog '(
              (define-syntax or2
@@ -161,7 +161,7 @@ and
 ``` 
 
 ### ClojureScript Support
-scheje is written using reader conditionals. the interpreter namespace
+Scheje is written using reader conditionals. The interpreter namespace
 can be used in a clojurescript project right away, in the browser, 
 or in node.js if you want to use the file loading facilities.
 
