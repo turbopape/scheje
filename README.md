@@ -4,10 +4,10 @@
 [![Clojars Project](https://img.shields.io/clojars/v/scheje.svg)](https://clojars.org/scheje)
 [![Gratipay Team](https://img.shields.io/gratipay/team/scheje.svg)](https://gratipay.com/scheje/)
 [![Slack Team](https://img.shields.io/badge/chat-%23%20team-yellowgreen.svg)](https://scheje.slack.com)
- 
+
  >"If you give someone Fortran, he has Fortran. If you give someone Lisp, he has any language he pleases."
  - Guy L. Steele
- 
+
 Using the magnificent eval/apply dance (as in page 13 of the
 Lisp 1.5 Manual), *scheje* is a tiny scheme implementation on Top of
 Clojure.
@@ -34,7 +34,7 @@ You give it a form and an environment, and you get your evaluation:
 ;;=> 3
 ```
 
-The function *eval-prog*, evaluates a whole program. This function is 
+The function *eval-prog*, evaluates a whole program. This function is
 bootstrapped with a starting
 environment, called the library (see [library.cljc](https://github.com/turbopape/scheje/blob/master/src/scheje/library.cljc) for the contents of the library). When launched, eval-prog evaluates all the forms, only showing the value of the last one.
 
@@ -95,8 +95,8 @@ supported:
 ```clojure
 (form-eval '(quasiquote
              (1
-              (+ 1 (unquote-splicing (cdr '(1 2 3)))) 
-              (unquote  (+ 1 a)))) 
+              (+ 1 (unquote-splicing (cdr '(1 2 3))))
+              (unquote  (+ 1 a))))
            { 'a 5})
 ;;=> (1 (+ 1 2 3) 6)
 ```
@@ -110,7 +110,7 @@ each *let* introduced expression's symbols are stored in its own
 scope. This avoids name clash:
 
 In the following example, a is defined at the root-env, but "inner" a
-is retruned from the *let* macro:
+is returned from the *let* macro:
 ```clojure
 (eval-prog '((define a "outer")
              (let ((x (and false false))
@@ -129,7 +129,7 @@ If we access a symbol outside the macro, we get its root binding:
              a))
 ;;=> "outer"
 ```
-## Hygienic Macros 
+## Hygienic Macros
 
 Inspired by
 [KFFD](http://web.cs.ucdavis.edu/~devanbu/teaching/260/kohlbecker.pdf)
@@ -141,7 +141,7 @@ evaluate their "root" form, i.e, looks if their name stripped out of the timesta
 bound in the execution environment. This 'sort of' forces capture of such symbols,
 as to see if they were intended to be passed as globals, for instance.
 
-For instance, these two exmaples work properly:
+For instance, these two examples work properly:
 ```clojure
 (eval-prog '(
              (define-syntax or2
@@ -150,24 +150,24 @@ For instance, these two exmaples work properly:
              (let ((t true)) (or2 false t ))))
 ;;=> true
 ```
-and 
+and
 
-```clojure 
-(eval-prog '( 
+```clojure
+(eval-prog '(
              (let ((if (lambda(x y z) "oops")))
-              (let ((g false)) 
+              (let ((g false))
                     (if g g false)))))
-;;=> false 
-``` 
+;;=> false
+```
 
 ### ClojureScript Support
-scheje is written using reader conditionals. the interpreter namespace
-can be used in a clojurescript project right away, in the browser, 
+scheje is written using reader conditionals. The interpreter namespace
+can be used in a clojurescript project right away, in the browser,
 or in node.js if you want to use the file loading facilities.
 
-### A little REPL 
+### A little REPL
 Now a **REPL** namespace is shipped, exposing a little REPL permitting
-to evaluating expressions and loading files. 
+to evaluating expressions and loading files.
 
 If you want to run it in Clojure/JVM, just clone the repo and launch
 ```shell
@@ -188,13 +188,13 @@ Please refer to the [Changelog](https://github.com/turbopape/scheje/blob/master/
 
 ## Contributors
 Thanks to these wonderful people who helped the development of Scheje:
-- [Balaji Rao](https://github.com/balajirrao) 
+- [Balaji Rao](https://github.com/balajirrao)
 
 ## TODOS - Wanna Contribute?
 You can see how you can help by seeing the [open issues](https://github.com/turbopape/scheje/issues)
 
 ## Credits
-scheje's Node.js REPL uses [readLineSync](https://github.com/anseki/readline-sync) from @anseki, which is licensed under the MIT License. 
+scheje's Node.js REPL uses [readLineSync](https://github.com/anseki/readline-sync) from @anseki, which is licensed under the MIT License.
 ## License
 Copyright © 2016 Rafik Naccache and Contributors.
-Distributed under the terms of the The MIT License.
+Distributed under the terms of the MIT License.
