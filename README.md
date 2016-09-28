@@ -5,7 +5,10 @@
 [![Gratipay Team](https://img.shields.io/gratipay/team/scheje.svg)](https://gratipay.com/scheje/)
 [![Slack Team](https://img.shields.io/badge/chat-%23%20team-yellowgreen.svg)](https://scheje.slack.com)
 
- >"If you give someone Fortran, he has Fortran. If you give someone Lisp, he has any language he pleases."
+<img src="./scheje-logo.jpg"
+ alt="Scheje Logo" title="The Scheje Logo" align="center" />
+
+>"If you give someone Fortran, he has Fortran. If you give someone Lisp, he has any language he pleases."
  - Guy L. Steele
 
 Using the magnificent eval/apply dance (as in page 13 of the
@@ -188,13 +191,16 @@ Please refer to the [Changelog](https://github.com/turbopape/scheje/blob/master/
 
 ## Contributors
 Thanks to these wonderful people who helped the development of Scheje:
-- [Balaji Rao](https://github.com/balajirrao)
+- [balajirrao](https://github.com/balajirrao)
 
 And to these awesome proof-readers:
 - [jaredestroud](https://github.com/jaredestroud)
 - [yurimalheiros](https://github.com/yurimalheiros)
 - [chasingSublimity](https://github.com/chasingSublimity)
 - [rom1504](https://github.com/rom1504)
+
+Special thanks for the awesome logo go to:
+- [morachimo](https://github.com/morachimo)
 
 ## TODOS - Wanna Contribute?
 You can see how you can help by seeing the [open issues](https://github.com/turbopape/scheje/issues)
