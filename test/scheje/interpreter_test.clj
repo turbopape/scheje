@@ -62,8 +62,8 @@
   (testing "Quoting, unquoting, unquote-splicing..."
     (is (= '(1 (+ 1 2 3) 6) (form-eval '(quasiquote
                                          (1
-                                          (+ 1 (unquote-splicing (cdr '(1 2 3)))) 
-                                          (unquote  (+ 1 a)))) 
+                                          (+ 1 (unquote-splicing (cdr '(1 2 3))))
+                                          (unquote  (+ 1 a))))
                                        { 'a 5})))))
 (deftest scope-test-1
   (testing "Scoping test 1: "
@@ -119,7 +119,7 @@
 (deftest named-let
   (testing "named let works?"
     (is (= 6 (eval-prog '((let f ((x 3))
-                               (cond 
+                               (cond
                                  ((= x 0) 1 )
                                  (else (* x  (f (- x 1))))))))))))
 
@@ -170,11 +170,11 @@
     ))
 
 (deftest closure-test-1
-  (testing "let based closure work ?"
+  (testing "let based closure work?"
     (is (= 5 (eval-prog '(((let ((a 1)) (lambda (x) (+ x a))) 4)))))))
 
 (deftest closure-test-2
-  (testing "variadic closure with dot works ?"
+  (testing "variadic closure with dot works?"
     (is (= '(2 2 3 4) (eval-prog '(
                                    ((let ((b 1)) (lambda (x . y) (cons (+ b x) y))) 1 2 3 4) ))))))
 
@@ -183,7 +183,7 @@
     (is (= '(100 1 2 3 4) (eval-prog '(((let ((b 100))(lambda x (cons b x))) 1 2 3 4)))))))
 
 (deftest closure-test-4
-  (testing "closure defined using 'define' works ?"
+  (testing "closure defined using 'define' works?"
     (is (= 3 (eval-prog
                '((define add (lambda (c) (lambda (x) (+ x c))))
                  ((add 1) 2)))))))
